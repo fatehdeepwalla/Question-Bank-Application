@@ -13,10 +13,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Component
-@ConditionalOnProperty(
-        name = "question-bank.initialize",
-        havingValue = "true"
-)
+@ConditionalOnProperty(name = "question-bank.initialize", havingValue = "true")
 public class InitializationRunner implements CommandLineRunner {
 
     @Value("${question-bank.images-directory}")
@@ -34,6 +31,6 @@ public class InitializationRunner implements CommandLineRunner {
         // Step 2: Save those objects as JSON files.
         JSON_Writer.writeQuestions(questions, Path.of(initializationDirectory));
 
-        System.out.println("Initialized " + questions.size() + " questions and saved their JSON files.");
+        System.out.println("\nInitialized " + questions.size() + " questions and saved their JSON files.\n");
     }
 }

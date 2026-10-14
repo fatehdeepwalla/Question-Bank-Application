@@ -37,7 +37,7 @@ public final class JSON_Writer {
             OBJECT_MAPPER.writeValue(jsonFile.toFile(), question);
             count++;
         }
-        System.out.printf("\n\n\n\nNumber of Questions to Write: %d", questions.size());
-        System.out.printf("Number of JSON Files Written: %d\n\n\n\n ",count);
+        System.out.printf("\nNumber of Questions to Write: %d\n", questions.size());
+        System.out.printf("Number of JSON Files Written: %d\n",count);
     }
 }

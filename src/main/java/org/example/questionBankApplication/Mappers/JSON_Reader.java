@@ -54,8 +54,8 @@ public final class JSON_Reader {
             }
             questions.add(question);
         }
-        System.out.printf("\n\n\n\nNumber of JSON Files Read: %d",count);
-        System.out.printf("Number of Questions Created After Reading: %d\n\n\n\n",questions.size());
+        System.out.printf("\nNumber of JSON Files Read: %d\n",count);
+        System.out.printf("Number of Questions Created After Reading: %d\n",questions.size());
 
         return questions;
     }

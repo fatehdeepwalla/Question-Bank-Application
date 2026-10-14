@@ -34,7 +34,7 @@ public final class Question_Initializer {
                 id++;
             }
         }
-        System.out.printf("\n\n\n\nNumber of Questions Object Created from Images: %d\n\n\n\n ", questions.size());
+        System.out.printf("\nNumber of Questions Object Created from Images: %d\n", questions.size());
         return questions;
     }
 
