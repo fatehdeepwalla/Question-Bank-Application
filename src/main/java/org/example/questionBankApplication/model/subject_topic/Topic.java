@@ -1,4 +1,4 @@
-package org.example.questionBankApplication.model;
+package org.example.questionBankApplication.model.subject_topic;
 
 public enum Topic {
     // Discrete Mathematics

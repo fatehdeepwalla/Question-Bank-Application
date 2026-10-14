@@ -1,9 +1,12 @@
-package org.example.questionBankApplication.model;
+package org.example.questionBankApplication.model.subject_topic;
 
 import java.util.Map;
 import java.util.Set;
 
-public class SubjectTopicMap {
+public final class SubjectTopicMap {
+
+    // This class cannot be instantiated
+    private SubjectTopicMap(){};
 
     public static Set<Topic> getTopics(Subject subject) {
         if (subject == null) {

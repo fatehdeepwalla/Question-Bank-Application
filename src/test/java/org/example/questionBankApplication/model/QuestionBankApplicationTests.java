@@ -1,5 +1,8 @@
 package org.example.questionBankApplication.model;
 
+import org.example.questionBankApplication.model.subject_topic.Subject;
+import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
+import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
