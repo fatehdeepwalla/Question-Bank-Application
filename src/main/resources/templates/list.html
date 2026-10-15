@@ -11,6 +11,17 @@
 <div class="app-shell">
     <div th:replace="~{listFragments/Portfolio_Links :: Portfolio_Links}"></div>
     <main class="page-main">
+        <div class="page-alert page-alert-success" role="status"
+             th:if="${successMessage}"
+             th:text="${successMessage}">
+            Question updated successfully.
+        </div>
+
+        <div class="page-alert page-alert-error" role="alert"
+             th:if="${errorMessage}"
+             th:text="${errorMessage}">
+            An error occurred.
+        </div>
         <div th:replace="~{listFragments/About_the_App :: About_the_App}"></div>
         <div th:replace="~{listFragments/Stats :: Stats}"></div>
         <div th:replace="~{listFragments/Filters :: Filters}"></div>
