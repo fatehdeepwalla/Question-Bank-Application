@@ -89,7 +89,7 @@ button, input, select { font: inherit; }
 .eyebrow-line { width: 24px; height: 2px; border-radius: 2px; background: #9185ff; }
 .hero h1 { margin: 18px 0 13px; color: #fff; font-family: 'Manrope', sans-serif; font-size: clamp(32px, 4.2vw, 47px); line-height: 1.16; letter-spacing: -2.1px; font-weight: 800; }
 .hero h1 span { color: #a8a0ff; }
-.hero-description { max-width: 565px; margin: 0; color: #b7bdd1; font-size: 13px; line-height: 1.85; }
+.hero-description { max-width: 650px; margin: 0; color: #b7bdd1; font-size: 13px; line-height: 1.85; }
 .hero-footnote { display: flex; align-items: center; gap: 9px; margin-top: 23px; color: #e1e3f5; font-size: 11px; font-weight: 500; }
 .hero-footnote-icon { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 7px; color: #d9d3ff; background: rgba(138, 126, 255, .19); }
 .hero-art { position: relative; flex: 0 0 300px; align-self: stretch; min-height: 210px; margin-left: 20px; }

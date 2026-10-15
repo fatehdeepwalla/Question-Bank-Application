@@ -11,15 +11,17 @@ public class Question {
     ///////////////////////////////////////////// Instance Variables ///////////////////////////////////////////////////
     private int id;
     private String imagePath;
+
     private int year;
     private Subject subject;
     private Topic topic;
-    private Set<Tag> questionTags;
     private Type type;
     private Answer answer;
 
+    private Set<Tag> questionTags;
+
     ///////////////////////////////////////////// Constructor //////////////////////////////////////////////////////////
-    public Question(int id, String imagePath, int year, Topic topic, Set<Tag> questionTags, Type type, Answer answer) {
+    public Question(int id, String imagePath, int year, Topic topic, Type type, Answer answer, Set<Tag> questionTags) {
 
         this.id = id;
         if(imagePath==null) {throw new RuntimeException("Null Argument");}
@@ -28,11 +30,11 @@ public class Question {
         this.year = year;
         this.subject = topic == null?  null: SubjectTopicMap.getSubject(topic);
         this.topic = topic;
-        this.questionTags = questionTags;
-
         validateTypeAndAnswer(type, answer);
         this.type = type;
         this.answer = answer;
+
+        this.questionTags = questionTags;
     }
     private static void validateTypeAndAnswer(Type type, Answer answer) {
         if (answer == null) {return;} // A question may not have an answer yet
@@ -60,12 +62,7 @@ public class Question {
         this.topic = topic;
         this.subject = SubjectTopicMap.getSubject(topic);
     }
-    ///////////////////////////////////////////// {Tags} ///////////////////////////////////////////////////////////////
-    public Set<Tag> getQuestionTags() {return questionTags;}
-    public void setQuestionTags(Set<Tag> questionTags) {
-        if (questionTags == null) {throw new IllegalArgumentException("questionTags cannot be null");}
-        this.questionTags = questionTags;
-    }
+
     ///////////////////////////////////////////// {Type} ///////////////////////////////////////////////////////////////
     public Type getType() {return type;}
     public void setType(Type type) {
@@ -96,5 +93,12 @@ public class Question {
         if (type != expectedType) {
             throw new IllegalStateException("Expected question type " + expectedType + ", but the current type is " + type);
         }
+    }
+
+    ///////////////////////////////////////////// {Tags} ///////////////////////////////////////////////////////////////
+    public Set<Tag> getQuestionTags() {return questionTags;}
+    public void setQuestionTags(Set<Tag> questionTags) {
+        if (questionTags == null) {throw new IllegalArgumentException("questionTags cannot be null");}
+        this.questionTags = questionTags;
     }
 }

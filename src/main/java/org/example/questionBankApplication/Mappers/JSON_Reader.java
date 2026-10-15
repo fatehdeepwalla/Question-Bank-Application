@@ -7,14 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.*;
-import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -76,13 +74,22 @@ public final class JSON_Reader {
         JsonNode root = OBJECT_MAPPER.readTree(jsonFile.toFile());
         if (root == null || !root.isObject()) {throw new IOException("JSON must contain a question object");}
 
+        // Read {id, imagePath, year}
         int id = readInt(root, "id");
         String imagePath = readString(root, "imagePath");
         int year = readInt(root, "year");
 
-        // Read topic. A null topic is permitted by the model.
+        // Read {topic}. A null topic is permitted by the model.
         JsonNode topicNode = requiredNode(root, "topic");
         Topic topic = topicNode.isNull() ? null : OBJECT_MAPPER.treeToValue(topicNode, Topic.class);
+
+        // Reading {Subject} and matching it with constructed subject from topic will be done later
+
+        // Read question {type}. It can be null for an incomplete question.
+        JsonNode typeNode = requiredNode(root, "type");
+        Type type = typeNode.isNull() ? null : OBJECT_MAPPER.treeToValue(typeNode, Type.class);
+
+        // We will create question object without {answer} than later add it using question setters
 
         // Read tags. A null tag set is permitted by the model.
         JsonNode tagsNode = requiredNode(root, "questionTags");
@@ -93,15 +100,9 @@ public final class JSON_Reader {
             questionTags = OBJECT_MAPPER.convertValue(tagsNode, TAG_SET_TYPE);
         }
 
-        // Read question type. It can be null for an incomplete question.
-        JsonNode typeNode = requiredNode(root, "type");
-        Type type = typeNode.isNull() ? null : OBJECT_MAPPER.treeToValue(typeNode, Type.class);
-
-        JsonNode answerNode = requiredNode(root, "answer");
-        if (!answerNode.isNull() && type == null) {throw new IOException("A non-null answer requires a question type");}
 
         // Construct the question without its answer first.
-        Question question = new Question(id, imagePath, year, topic, questionTags, type, null);
+        Question question = new Question(id, imagePath, year, topic, type, null, questionTags);
 
         // Verify the serialized subject agrees with the topic mapping.
         JsonNode storedSubject = requiredNode(root, "subject");
@@ -111,9 +112,13 @@ public final class JSON_Reader {
         }
 
         // Reconstruct the appropriate concrete answer through Question's setters.
+        JsonNode answerNode = requiredNode(root, "answer");
+        if (!answerNode.isNull() && type == null) {throw new IOException("A non-null answer requires a question type");}
+
         if (!answerNode.isNull()) {readAnswer(question, type, answerNode);}
         return question;
     }
+
     private static void readAnswer(Question question, Type type, JsonNode answerNode) throws IOException {
         if (!answerNode.isObject()) {throw new IOException("'answer' must be a JSON object or null");}
         switch (type) {
@@ -137,10 +142,6 @@ public final class JSON_Reader {
             }
         }
     }
-    private static JsonNode requiredNode(JsonNode object, String fieldName) throws IOException {
-        if (!object.has(fieldName)) {throw new IOException("Required JSON property is missing: " + fieldName);}
-        return object.get(fieldName);
-    }
     private static int readInt(JsonNode object, String fieldName) throws IOException {
         JsonNode node = requiredNode(object, fieldName);
         if (!node.isIntegralNumber() || !node.canConvertToInt()) {
@@ -159,6 +160,10 @@ public final class JSON_Reader {
             throw new IOException("'" + fieldName + "' must be a number");
         }
         return node.doubleValue();
+    }
+    private static JsonNode requiredNode(JsonNode object, String fieldName) throws IOException {
+        if (!object.has(fieldName)) {throw new IOException("Required JSON property is missing: " + fieldName);}
+        return object.get(fieldName);
     }
     private static boolean isJsonFile(Path path) {
         return path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json");
