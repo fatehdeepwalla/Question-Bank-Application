@@ -213,8 +213,11 @@
         <div class="empty-state" th:if="${items.isEmpty()}">
             <div class="empty-state-icon"><svg viewBox="0 0 24 24"><path d="M5 4.75A2.75 2.75 0 0 1 7.75 2H20v17H7.75A2.75 2.75 0 0 0 5 21.75z"/><path d="M5 4.75v17M8.5 6H16M8.5 9.5H16"/></svg></div>
             <h3>Your library is waiting for its first question</h3>
-            <p>No questions were loaded. Check that <code>question-bank.JSON-directory</code> points to the folder containing your question JSON files.</p>
-            <p>Another case is Filtering Criteria has produced empty list.</p>
+            <p>No questions were loaded. Check that
+                <code>question-bank.JSON-directory</code>
+                points to the folder containing your question JSON files.
+                Another case is Filtering Criteria has produced empty list.
+            </p>
         </div>
     </section>
 </section>

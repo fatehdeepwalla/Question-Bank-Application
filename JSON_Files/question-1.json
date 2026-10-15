@@ -1,10 +1,12 @@
 {
   "id" : 1,
   "imagePath" : "Question_Images\\Screenshot 2026-10-14 202530.png",
-  "year" : -9999,
-  "subject" : null,
-  "topic" : null,
-  "questionTags" : null,
-  "type" : null,
-  "answer" : null
+  "year" : 2021,
+  "subject" : "Discrete_Mathematics",
+  "topic" : "Relation",
+  "type" : "MCQ",
+  "answer" : {
+    "correctOption" : "B"
+  },
+  "questionTags" : [ "IMPORTANT", "REPEATED", "SOLVED" ]
 }

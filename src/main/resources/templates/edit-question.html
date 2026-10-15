@@ -49,30 +49,38 @@
 
                     <div class="edit-fields-grid">
                         <label class="edit-field">
-                            <span>GATE year <small>Optional</small></span>
+                            <span>GATE year <small>Required</small></span>
                             <input type="number"
                                    th:field="*{year}"
                                    min="1990"
                                    max="2030"
                                    step="1"
                                    inputmode="numeric"
-                                   placeholder="e.g. 2024">
-                            <small class="edit-field-hint">Leave blank if the year is unknown.</small>
+                                   placeholder="e.g. 2024"
+                                   required>
+                            <small class="edit-field-hint">Enter the year in which the question appeared.</small>
                         </label>
 
                         <label class="edit-field">
-                            <span>Subject</span>
-                            <select id="edit-subject" th:field="*{subject}">
-                                <option value="">Subject not assigned</option>
+                            <span>Subject <small>Required</small></span>
+                            <select id="edit-subject"
+                                    th:field="*{subject}"
+                                    required>
+                                <option value="">Select a subject</option>
                                 <option th:each="subjectOption : ${subjectOptions}"
                                         th:value="${subjectOption.name()}"
-                                        th:text="${#strings.replace(subjectOption.name(), '_', ' ')}">Subject</option>
+                                        th:text="${#strings.replace(subjectOption.name(), '_', ' ')}">
+                                    Subject
+                                </option>
                             </select>
                         </label>
 
                         <label class="edit-field edit-field-wide">
-                            <span>Topic</span>
-                            <select id="edit-topic" th:field="*{topic}" disabled>
+                            <span>Topic <small>Required</small></span>
+                            <select id="edit-topic"
+                                    th:field="*{topic}"
+                                    required
+                                    disabled>
                                 <option value="">Select a subject first</option>
                             </select>
                             <small class="edit-field-hint">Only topics belonging to the selected subject are available.</small>
@@ -90,12 +98,16 @@
                     </div>
 
                     <label class="edit-field edit-type-field">
-                        <span>Question type</span>
-                        <select id="edit-type" th:field="*{type}">
-                            <option value="">Type not set</option>
+                        <span>Question type <small>Required</small></span>
+                        <select id="edit-type"
+                                th:field="*{type}"
+                                required>
+                            <option value="">Select a question type</option>
                             <option th:each="typeOption : ${typeOptions}"
                                     th:value="${typeOption.name()}"
-                                    th:text="${typeOption.name()}">MCQ</option>
+                                    th:text="${typeOption.name()}">
+                                MCQ
+                            </option>
                         </select>
                     </label>
 
@@ -107,13 +119,20 @@
                                 <h3>Multiple-choice answer (MCQ)</h3>
                                 <p>Select the one correct option.</p>
                             </div>
+
                             <label class="edit-field">
-                                <span>Correct option <small>Optional</small></span>
-                                <select th:field="*{mcqCorrectOption}" data-answer-control>
-                                    <option value="">Answer not assigned</option>
+                                <span>Correct option <small>Required</small></span>
+                                <select th:field="*{mcqCorrectOption}"
+                                        data-answer-control
+                                        required>
+                                    <option value="">Select the correct option</option>
                                     <option th:each="option : ${answerOptions}"
                                             th:value="${option.name()}"
-                                            th:text="${option.name() == 'No_Valid_Answer_Stored' ? 'No valid answer stored' : option.name()}">A</option>
+                                            th:text="${option.name() == 'No_Valid_Answer_Stored'
+                                                      ? 'No valid answer stored'
+                                                      : option.name()}">
+                                        A
+                                    </option>
                                 </select>
                             </label>
                         </section>
@@ -123,16 +142,20 @@
                                  th:hidden="${form.type != 'MSQ'}">
                             <div class="edit-answer-panel-heading">
                                 <h3>Multiple-select answer (MSQ)</h3>
-                                <p>Select every correct option.</p>
+                                <p>Select every correct option. At least one option is required.</p>
                             </div>
+
                             <div class="edit-answer-options">
-                                <label class="edit-answer-option" th:each="option : ${answerOptions}">
+                                <label class="edit-answer-option"
+                                       th:each="option : ${answerOptions}">
                                     <input type="checkbox"
                                            name="msqCorrectOptions"
                                            data-answer-control
                                            th:value="${option.name()}"
                                            th:checked="${form.msqCorrectOptions != null and form.msqCorrectOptions.contains(option.name())}">
-                                    <span th:text="${option.name() == 'No_Valid_Answer_Stored' ? 'No valid answer stored' : option.name()}">A</span>
+                                    <span th:text="${option.name() == 'No_Valid_Answer_Stored'
+                                                    ? 'No valid answer stored'
+                                                    : option.name()}">A</span>
                                 </label>
                             </div>
                         </section>
@@ -144,30 +167,38 @@
                                 <h3>Numerical answer (NAT)</h3>
                                 <p>Enter the accepted numeric range. Use the same value for an exact answer.</p>
                             </div>
+
                             <div class="edit-fields-grid edit-nat-grid">
                                 <label class="edit-field">
-                                    <span>Minimum value <small>Optional</small></span>
+                                    <span>Minimum value <small>Required</small></span>
                                     <input type="number"
                                            th:field="*{natMinValue}"
                                            data-answer-control
+                                           data-nat-min
                                            step="any"
                                            inputmode="decimal"
-                                           placeholder="Minimum">
+                                           placeholder="Minimum"
+                                           required>
                                 </label>
+
                                 <label class="edit-field">
-                                    <span>Maximum value <small>Optional</small></span>
+                                    <span>Maximum value <small>Required</small></span>
                                     <input type="number"
                                            th:field="*{natMaxValue}"
                                            data-answer-control
+                                           data-nat-max
                                            step="any"
                                            inputmode="decimal"
-                                           placeholder="Maximum">
+                                           placeholder="Maximum"
+                                           required>
                                 </label>
                             </div>
                         </section>
 
-                        <p class="edit-no-answer-note" id="edit-no-answer-note" hidden>
-                            Choose a question type to configure its answer. You may leave the answer unassigned.
+                        <p class="edit-no-answer-note"
+                           id="edit-no-answer-note"
+                           hidden>
+                            Choose a question type to configure its answer. An answer is required before saving.
                         </p>
                     </div>
                 </section>
@@ -177,9 +208,9 @@
                         <span class="edit-section-icon" aria-hidden="true">03</span>
                         <div>
                             <h2>Tags</h2>
-                            <p>Select up to three tags that describe this question.</p>
+                            <p>Select any number of tags that describe this question.</p>
                         </div>
-                        <span class="edit-tag-count" id="edit-tag-count">0 of 3 selected</span>
+                        <span class="edit-tag-count" id="edit-tag-count">0 selected</span>
                     </div>
 
                     <div class="edit-tag-options">
@@ -192,8 +223,12 @@
                             <span th:text="${#strings.replace(tag.name(), '_', ' ')}">Important</span>
                         </label>
                     </div>
-                    <p class="edit-tag-limit-message" id="edit-tag-limit-message" role="status" hidden>
-                        You can select up to three tags. Remove one selected tag before choosing another.
+
+                    <p class="edit-field-hint" role="note">
+                        Selecting <strong>Very Important</strong> automatically selects
+                        <strong>Important</strong>. Selecting
+                        <strong>Important</strong> alone does not automatically select
+                        <strong>Very Important</strong>.
                     </p>
                 </section>
 
@@ -210,15 +245,25 @@
                     <span class="preview-label"><span class="preview-label-dot"></span> SOURCE IMAGE</span>
                     <span class="edit-readonly-pill">Read only</span>
                 </div>
+
                 <div class="edit-source-image" th:if="${questionImageUrl != null}">
                     <img th:src="${questionImageUrl}"
                          th:alt="|Source image for ${questionIdLabel}|"
                          loading="lazy">
                 </div>
-                <div class="edit-source-image edit-source-image-empty" th:if="${questionImageUrl == null}">
-                    <span class="fallback-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
+
+                <div class="edit-source-image edit-source-image-empty"
+                     th:if="${questionImageUrl == null}">
+                    <span class="fallback-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="3"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="m21 15-5-5L5 21"/>
+                        </svg>
+                    </span>
                     <strong>Image unavailable</strong>
                 </div>
+
                 <div class="edit-source-card-footer">
                     <span class="metadata-label">QUESTION ID</span>
                     <strong th:text="${questionIdLabel}">QB-0001</strong>
@@ -238,8 +283,19 @@
         const subjectSelect = document.getElementById("edit-subject");
         const topicSelect = document.getElementById("edit-topic");
         const typeSelect = document.getElementById("edit-type");
-        const answerPanels = Array.from(document.querySelectorAll(".edit-answer-panel"));
+        const editForm = document.getElementById("question-edit-form");
+
+        const answerPanels = Array.from(
+            document.querySelectorAll(".edit-answer-panel")
+        );
         const noAnswerNote = document.getElementById("edit-no-answer-note");
+
+        const msqCheckboxes = Array.from(
+            document.querySelectorAll('input[name="msqCorrectOptions"]')
+        );
+
+        const natMinInput = document.querySelector("[data-nat-min]");
+        const natMaxInput = document.querySelector("[data-nat-max]");
 
         function updateTopics(subjectName, topicToKeep) {
             topicSelect.replaceChildren();
@@ -251,6 +307,7 @@
             }
 
             const availableTopics = subjectTopicOptions[subjectName] || [];
+
             if (availableTopics.length === 0) {
                 topicSelect.add(new Option("No topics available", ""));
                 topicSelect.disabled = true;
@@ -259,11 +316,16 @@
 
             topicSelect.disabled = false;
             topicSelect.add(new Option("Choose a topic", ""));
+
             availableTopics.forEach(function (topicName) {
-                topicSelect.add(new Option(topicName.replace(/_/g, " "), topicName));
+                topicSelect.add(
+                    new Option(topicName.replace(/_/g, " "), topicName)
+                );
             });
 
-            topicSelect.value = availableTopics.includes(topicToKeep || "") ? topicToKeep : "";
+            topicSelect.value = availableTopics.includes(topicToKeep || "")
+                ? topicToKeep
+                : "";
         }
 
         subjectSelect.addEventListener("change", function () {
@@ -277,42 +339,154 @@
 
             answerPanels.forEach(function (panel) {
                 const active = panel.dataset.answerType === selectedType;
+
                 panel.hidden = !active;
+
                 panel.querySelectorAll("input, select").forEach(function (control) {
                     control.disabled = !active;
                 });
-                if (active) activePanelFound = true;
+
+                if (active) {
+                    activePanelFound = true;
+                }
             });
 
+            // Clear a previous MSQ validation error when switching answer type.
+            msqCheckboxes.forEach(function (checkbox) {
+                checkbox.setCustomValidity("");
+            });
+
+            updateNatValidity();
             noAnswerNote.hidden = activePanelFound;
         }
 
         typeSelect.addEventListener("change", updateAnswerFields);
 
-        const tagCheckboxes = Array.from(document.querySelectorAll(".edit-tag-checkbox"));
+        /*
+         * An MSQ answer must contain at least one selected option.
+         * HTML's required attribute on every checkbox would incorrectly
+         * require every option, so this is checked as a group instead.
+         */
+        msqCheckboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                msqCheckboxes.forEach(function (option) {
+                    option.setCustomValidity("");
+                });
+            });
+        });
+
+        /*
+         * A NAT answer must have both values, and the minimum must not
+         * exceed the maximum. The required attributes handle blank values.
+         */
+        function updateNatValidity() {
+            if (!natMinInput || !natMaxInput) {
+                return;
+            }
+
+            natMaxInput.setCustomValidity("");
+
+            if (natMinInput.disabled || natMaxInput.disabled) {
+                return;
+            }
+
+            if (natMinInput.value !== "" &&
+                natMaxInput.value !== "" &&
+                Number(natMinInput.value) > Number(natMaxInput.value)) {
+                natMaxInput.setCustomValidity(
+                    "Maximum value must be greater than or equal to minimum value."
+                );
+            }
+        }
+
+        if (natMinInput) {
+            natMinInput.addEventListener("input", updateNatValidity);
+        }
+
+        if (natMaxInput) {
+            natMaxInput.addEventListener("input", updateNatValidity);
+        }
+
+        /*
+         * Very Important -> automatically select Important.
+         * Important -> does not automatically select Very Important.
+         *
+         * Existing stored selections are not modified merely by opening
+         * the form; the automatic selection applies when Very Important is checked.
+         */
+        const tagCheckboxes = Array.from(
+            document.querySelectorAll(".edit-tag-checkbox")
+        );
         const tagCount = document.getElementById("edit-tag-count");
-        const tagLimitMessage = document.getElementById("edit-tag-limit-message");
-        const maximumTags = 3;
+
+        function normalizeTagName(value) {
+            return value.toUpperCase().replace(/[\s_]+/g, "");
+        }
+
+        const importantTag = tagCheckboxes.find(function (checkbox) {
+            return normalizeTagName(checkbox.value) === "IMPORTANT";
+        });
+
+        const veryImportantTag = tagCheckboxes.find(function (checkbox) {
+            return normalizeTagName(checkbox.value) === "VERYIMPORTANT";
+        });
 
         function refreshTagCount() {
-            const count = tagCheckboxes.filter(function (checkbox) { return checkbox.checked; }).length;
-            tagCount.textContent = count + " of " + maximumTags + " selected";
-            return count;
+            const count = tagCheckboxes.filter(function (checkbox) {
+                return checkbox.checked;
+            }).length;
+
+            tagCount.textContent = count + (count === 1 ? " selected" : " selected");
         }
 
         tagCheckboxes.forEach(function (checkbox) {
             checkbox.addEventListener("change", function () {
-                if (checkbox.checked && refreshTagCount() > maximumTags) {
-                    checkbox.checked = false;
-                    tagLimitMessage.hidden = false;
-                } else if (refreshTagCount() <= maximumTags) {
-                    tagLimitMessage.hidden = true;
+                if (checkbox === veryImportantTag &&
+                    checkbox.checked &&
+                    importantTag) {
+                    importantTag.checked = true;
                 }
+
+                // No maximum number of selected tags.
                 refreshTagCount();
             });
         });
 
-        // Initialize from the values already stored in the question.
+        editForm.addEventListener("submit", function (event) {
+            updateNatValidity();
+
+            if (typeSelect.value === "MSQ") {
+                const activeOptions = msqCheckboxes.filter(function (checkbox) {
+                    return !checkbox.disabled;
+                });
+
+                const hasSelectedAnswer = activeOptions.some(function (checkbox) {
+                    return checkbox.checked;
+                });
+
+                if (!hasSelectedAnswer) {
+                    event.preventDefault();
+
+                    if (activeOptions.length > 0) {
+                        activeOptions[0].setCustomValidity(
+                            "Select at least one correct answer option."
+                        );
+                        activeOptions[0].reportValidity();
+                    }
+
+                    return;
+                }
+            }
+
+            if (typeSelect.value === "NAT" &&
+                natMaxInput &&
+                !natMaxInput.checkValidity()) {
+                event.preventDefault();
+                natMaxInput.reportValidity();
+            }
+        });
+
+        // Populate the form with the selected question's existing values.
         subjectSelect.value = initialSubject || "";
         updateTopics(subjectSelect.value, initialTopic || "");
         updateAnswerFields();
