@@ -1,0 +1,333 @@
+<section th:fragment="Filters">
+
+    <form class="filter-panel" th:action="@{/questions}" method="get">
+
+        <!-- Panel heading -->
+        <div class="filter-panel-heading">
+            <div class="filter-heading-copy">
+                <span class="filter-kicker">REFINE THE COLLECTION</span>
+                <h3>Find questions</h3>
+                <p>Combine tag rules and question details to find exactly what you need.</p>
+            </div>
+
+            <a class="filter-reset" th:href="@{/questions}">
+                <span aria-hidden="true">↺</span>
+                Clear all
+            </a>
+        </div>
+
+        <div class="filter-validation-errors"
+             role="alert"
+             th:if="${!filterErrors.isEmpty()}">
+
+            <p th:each="error : ${filterErrors}"
+               th:text="${error}"></p>
+        </div>
+
+        <!-- TAG CRITERIA -->
+        <section class="tag-filter-section" aria-labelledby="tag-filter-heading">
+
+            <div class="filter-section-heading">
+                <div class="filter-section-title">
+                    <span class="filter-section-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3.4 13.4a2 2 0 0 1 0-2.8L10.6 3.4H18a2 2 0 0 1 2 2z"/>
+                            <circle cx="15.5" cy="8.5" r="1"/>
+                        </svg>
+                    </span>
+
+                    <div>
+                        <h4 id="tag-filter-heading">Tag rules</h4>
+                        <p>Specify which tags questions must have or must not have.</p>
+                    </div>
+                </div>
+
+                <span class="filter-section-note">Neutral by default</span>
+            </div>
+
+            <div class="tag-filter-grid">
+
+                <!-- One three-state control per Tag enum value -->
+                <div class="tag-filter-row"
+                     th:each="tagOption : ${tagOptions}"
+                     role="group"
+                     th:aria-label="|${#strings.replace(tagOption.name(), '_', ' ')} tag filter|">
+
+                    <span class="tag-filter-name" th:text="${#strings.replace(tagOption.name(), '_', ' ')}"></span>
+
+                    <div class="tag-state-control">
+
+                        <!-- Include -->
+                        <input class="tag-state-input"
+                               type="radio"
+                               th:id="|tag-${tagOption.name()}-include|"
+                               th:name="|tag_${tagOption.name()}|"
+                               value="include"
+                               th:checked="${tagStates != null and tagStates[tagOption.name()] == 'include'}">
+
+                        <label class="tag-state-option tag-include"
+                               th:for="|tag-${tagOption.name()}-include|">
+                            <span aria-hidden="true">+</span>
+                            Include
+                        </label>
+
+                        <!-- Neutral -->
+                        <input class="tag-state-input"
+                               type="radio"
+                               th:id="|tag-${tagOption.name()}-neutral|"
+                               th:name="|tag_${tagOption.name()}|"
+                               value="neutral"
+                               th:checked="${tagStates == null or tagStates[tagOption.name()] == null or tagStates[tagOption.name()] == 'neutral'}">
+
+                        <label class="tag-state-option tag-neutral"
+                               th:for="|tag-${tagOption.name()}-neutral|">
+                            <span aria-hidden="true">·</span>
+                            Neutral
+                        </label>
+
+                        <!-- Exclude -->
+                        <input class="tag-state-input"
+                               type="radio"
+                               th:id="|tag-${tagOption.name()}-exclude|"
+                               th:name="|tag_${tagOption.name()}|"
+                               value="exclude"
+                               th:checked="${tagStates != null and tagStates[tagOption.name()] == 'exclude'}">
+
+                        <label class="tag-state-option tag-exclude"
+                               th:for="|tag-${tagOption.name()}-exclude|">
+                            <span aria-hidden="true">−</span>
+                            Exclude
+                        </label>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="tag-filter-help">
+                <span aria-hidden="true">ⓘ</span>
+                Included tags must all match. A question containing any excluded
+                tag will be removed from the results.
+            </p>
+
+        </section>
+
+        <div class="filter-divider"></div>
+
+        <!-- QUESTION CRITERIA -->
+        <section class="question-filter-section"
+                 aria-labelledby="question-filter-heading">
+
+            <div class="filter-section-heading">
+                <div class="filter-section-title">
+                    <span class="filter-section-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 5h16M4 12h16M4 19h16"/>
+                            <circle cx="8" cy="5" r="2"/>
+                            <circle cx="15" cy="12" r="2"/>
+                            <circle cx="10" cy="19" r="2"/>
+                        </svg>
+                    </span>
+
+                    <div>
+                        <h4 id="question-filter-heading">Question details</h4>
+                        <p>Narrow the collection by year, subject and topic.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-grid">
+
+                <!-- Year remains an optional, typable field -->
+                <label class="filter-field" for="year-filter">
+                    <span>GATE year</span>
+
+                    <input id="year-filter"
+                           type="number"
+                           name="year"
+                           min="1990"
+                           max="2030"
+                           step="1"
+                           placeholder="Any year"
+                           th:value="${selectedYear}">
+                </label>
+
+                <!-- Subject -->
+                <label class="filter-field" for="subject-filter">
+                    <span>Subject</span>
+
+                    <select id="subject-filter" name="subject">
+                        <option value="">All subjects</option>
+
+                        <option th:each="subjectOption : ${subjectOptions}"
+                                th:value="${subjectOption.name()}"
+                                th:text="${#strings.replace(subjectOption.name(), '_', ' ')}"
+                                th:selected="${subjectOption.name() == selectedSubject}">
+                        </option>
+                    </select>
+                </label>
+
+                <!-- Topic -->
+                <label class="filter-field" for="topic-filter">
+                    <span>Topic</span>
+
+                    <select id="topic-filter"
+                            name="topic"
+                            disabled>
+                        <option value="">Select a subject first</option>
+                    </select>
+                </label>
+
+            </div>
+        </section>
+
+        <div class="filter-divider"></div>
+
+        <!-- SORTING -->
+        <section class="sorting-section"
+                 aria-labelledby="sorting-heading">
+
+            <div class="filter-section-heading">
+                <div class="filter-section-title">
+                    <span class="filter-section-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8 4v16M4 8l4-4 4 4"/>
+                            <path d="M16 20V4M12 16l4 4 4-4"/>
+                        </svg>
+                    </span>
+
+                    <div>
+                        <h4 id="sorting-heading">Sorting</h4>
+                        <p>Choose how the matching questions should be ordered.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-bottom">
+
+                <div class="filter-sort-fields">
+
+                    <label class="filter-field" for="sort-by">
+                        <span>Sort by</span>
+
+                        <select id="sort-by" name="sortBy">
+                            <option value="id"
+                                    th:selected="${sortBy == 'id'}">
+                                Question ID
+                            </option>
+
+                            <option value="year"
+                                    th:selected="${sortBy == 'year'}">
+                                GATE year
+                            </option>
+                        </select>
+                    </label>
+
+                    <label class="filter-field" for="sort-direction">
+                        <span>Order</span>
+
+                        <select id="sort-direction" name="direction">
+                            <option value="asc"
+                                    th:selected="${direction == 'asc'}">
+                                Low to high
+                            </option>
+
+                            <option value="desc"
+                                    th:selected="${direction == 'desc'}">
+                                High to low
+                            </option>
+                        </select>
+                    </label>
+
+                </div>
+
+                <button class="filter-apply" type="submit">
+                    <span>Apply filters</span>
+                    <span class="filter-apply-arrow" aria-hidden="true">→</span>
+                </button>
+
+            </div>
+
+        </section>
+
+    </form>
+
+    <script th:inline="javascript">
+        const topicMap = /*[[${subjectTopicOptions}]]*/ {};
+
+        const selectedTopicFromServer =
+            /*[[${selectedTopic}]]*/ "";
+
+        const subjectSelect =
+            document.getElementById("subject-filter");
+
+        const topicSelect =
+            document.getElementById("topic-filter");
+
+        if (subjectSelect && topicSelect) {
+
+            function updateTopics(subjectName, topicToKeep = "") {
+
+                // Clear the topics from the previous selection.
+                topicSelect.replaceChildren();
+
+                // No subject selected: keep Topic disabled.
+                if (!subjectName) {
+                    topicSelect.add(
+                        new Option("Select a subject first", "")
+                    );
+
+                    topicSelect.disabled = true;
+                    return;
+                }
+
+                // Get only the topics belonging to this subject.
+                const availableTopics = topicMap[subjectName] || [];
+
+                // Handle a subject with no available topics.
+                if (availableTopics.length === 0) {
+                    topicSelect.add(
+                        new Option("No topics available", "")
+                    );
+
+                    topicSelect.disabled = true;
+                    return;
+                }
+
+                // A valid subject is selected.
+                topicSelect.disabled = false;
+
+                topicSelect.add(
+                    new Option("All topics", "")
+                );
+
+                availableTopics.forEach(topicName => {
+                    const label = topicName.replace(/_/g, " ");
+
+                    topicSelect.add(
+                        new Option(label, topicName)
+                    );
+                });
+
+                // Restore the topic only if it belongs to this subject.
+                if (availableTopics.includes(topicToKeep)) {
+                    topicSelect.value = topicToKeep;
+                } else {
+                    topicSelect.value = "";
+                }
+            }
+
+            // When the subject changes, clear the previous topic.
+            subjectSelect.addEventListener("change", () => {
+                updateTopics(subjectSelect.value, "");
+            });
+
+            // Initialize the dropdowns when the page loads.
+            updateTopics(
+                subjectSelect.value,
+                selectedTopicFromServer || ""
+            );
+        }
+    </script>
+
+</section>

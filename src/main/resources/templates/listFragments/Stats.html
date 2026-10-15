@@ -1,0 +1,79 @@
+<section th:fragment="Stats">
+<section class="stats-grid" aria-label="Question bank overview">
+    <!-- Total questions -->
+    <article class="stat-card stat-primary">
+        <div class="stat-icon icon-total" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <path d="M5 4.75A2.75 2.75 0 0 1 7.75 2H20v17H7.75A2.75 2.75 0 0 0 5 21.75z"/>
+                <path d="M5 4.75v17M8.5 6H16M8.5 9.5H16"/>
+            </svg>
+        </div>
+        <div class="stat-details">
+            <span class="stat-label">Filtered Questions</span>
+            <strong th:text="${totalFilteredCount}">Null</strong>
+            <span class="stat-label"><br>Total Questions in Bank</span>
+            <strong th:text="${totalCount}">Null</strong>
+            <small>Questions loaded from JSON files </small>
+        </div>
+    </article>
+    <!-- Classified Tile-->
+    <article class="stat-card">
+        <div class="stat-icon icon-classified" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <path d="m5 12.5 4.2 4.2L19.5 6.5"/>
+                <path d="M21 12a9 9 0 1 1-2.1-5.8"/>
+            </svg>
+        </div>
+        <div class="stat-details">
+            <span class="stat-label">Classified</span>
+            <strong th:text="${classifiedQuestions}">Null</strong>
+            <div class="stat-breakdown">
+                <div><span>Year Assigned</span><span>: <span th:text="${yearAssignedCount}">Null</span></span></div>
+                <div><span>Subject Assigned</span><span>: <span th:text="${subjectAssignedCount}">Null</span></span></div>
+                <div><span>Topic Assigned</span><span>: <span th:text="${topicAssignedCount}">Null</span></span></div>
+                <div><span>Type Assigned</span><span>: <span th:text="${typeAssignedCount}">Null</span></span></div>
+                <div><span>Answer Assigned</span><span>: <span th:text="${answerAssignedCount}">Null</span></span></div>
+            </div>
+        </div>
+    </article>
+    <!-- Need Details Tile-->
+    <article class="stat-card">
+        <div class="stat-icon icon-review" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3 22 20H2z"/>
+                <path d="M12 9v4.5M12 17h.01"/>
+            </svg>
+        </div>
+        <div class="stat-details">
+            <span class="stat-label">Needs Details</span>
+            <strong th:text="${needsMetadataCount}">Null</strong>
+            <div class="stat-breakdown">
+                <div><span>Year Missing</span><span>: <span th:text="${missingYearCount}">Null</span></span></div>
+                <div><span>Subject Missing</span><span>: <span th:text="${missingSubjectCount}">Null</span></span></div>
+                <div><span>Topic Missing</span><span>: <span th:text="${missingTopicCount}">Null</span></span></div>
+                <div><span>Type Missing</span><span>: <span th:text="${missingTypeCount}">Null</span></span></div>
+                <div><span>Answer Missing</span><span>: <span th:text="${missingAnswerCount}">Null</span></span></div>
+            </div>
+        </div>
+    </article>
+    <!-- Tags Tile-->
+    <article class="stat-card">
+        <div class="stat-icon icon-tagged" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3.4 13.4a2 2 0 0 1 0-2.8L10.6 3.4H18a2 2 0 0 1 2 2z"/>
+                <circle cx="15.5" cy="8.5" r="1"/>
+            </svg>
+        </div>
+        <div class="stat-details">
+            <span class="stat-label">Tagged Questions</span>
+            <strong th:text="${taggedQuestions}">Null</strong>
+            <div class="stat-breakdown">
+                <div><span>Solved</span><span>: <span th:text="${solvedTagCount}">Null</span></span></div>
+                <div><span>Repeated</span><span>: <span th:text="${repeatedTagCount}">Null</span></span></div>
+                <div><span>Important</span><span>: <span th:text="${importantTagCount}">Null</span></span></div>
+                <div><span>Very Important</span><span>: <span th:text="${veryImportantTagCount}">Null</span></span></div>
+            </div>
+        </div>
+    </article>
+</section>
+</section>

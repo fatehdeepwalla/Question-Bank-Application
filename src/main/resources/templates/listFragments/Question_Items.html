@@ -1,0 +1,224 @@
+<section th:fragment="Question_Items">
+    <section class="library-section">
+        <div class="question-list" th:if="${!items.isEmpty()}">
+            <article class="question-card" th:each="item : ${items}">
+                <div class="question-preview">
+                    <div class="preview-toolbar">
+                        <span class="preview-label"><span class="preview-label-dot"></span> SOURCE IMAGE</span>
+                        <button type="button"
+                                class="preview-menu preview-image-button"
+                                th:disabled="${item.imageUrl == null}"
+                                th:attr="aria-label=|View full-size image for ${item.idLabel}|">···</button>
+                    </div>
+                    <div class="preview-canvas">
+                        <img th:if="${item.imageUrl != null}"
+                             th:src="${item.imageUrl}"
+                             th:alt="|Source image for ${item.idLabel}|"
+                             loading="lazy"
+                             onerror="this.hidden=true; this.parentElement.querySelector('.preview-fallback').hidden=false; const imageButton=this.closest('.question-preview').querySelector('.preview-image-button'); if(imageButton) imageButton.disabled=true;">
+                        <div class="preview-fallback" th:hidden="${item.imageUrl != null}">
+                            <span class="fallback-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
+                            <strong>Image unavailable</strong>
+                            <small>Check the image path in JSON</small>
+                        </div>
+                    </div>
+                    <div class="preview-footer">
+                        <span class="question-id" th:text="${item.idLabel}">QB-0001</span>
+                        <span class="image-status"><span class="image-status-dot"></span> Original asset</span>
+                    </div>
+                </div>
+
+                <div class="question-details">
+                    <div class="question-topline">
+                        <span class="question-number" th:text="|QUESTION ${item.id}|">QUESTION 1</span>
+                        <span th:class="${item.statusClass}">
+                            <span class="status-dot"></span>
+                            <span th:text="${item.statusLabel}">Needs details</span>
+                        </span>
+                    </div>
+
+                    <div class="metadata-grid">
+                        <div class="metadata-item">
+                            <span class="metadata-label">GATE YEAR</span>
+                            <span class="metadata-value"
+                                  th:class="${item.yearClass}"
+                                  th:text="${item.yearLabel}">Year not set</span>
+                        </div>
+
+                        <div class="metadata-item">
+                            <span class="metadata-label">Question type</span>
+                            <span class="metadata-value"
+                                  th:classappend="${item.typeLabel == 'Type not set'} ? 'value-missing' : ''"
+                                  th:text="${item.typeLabel}">Type not set</span>
+                        </div>
+
+                        <div class="metadata-item">
+                            <span class="metadata-label">Subject</span>
+                            <span class="metadata-value"
+                                  th:classappend="${item.subjectLabel == 'Subject not assigned'} ? 'value-missing' : ''"
+                                  th:text="${item.subjectLabel}">Subject not assigned</span>
+                        </div>
+
+                        <div class="metadata-item">
+                            <span class="metadata-label">Topic</span>
+                            <span class="metadata-value"
+                                  th:classappend="${item.topicLabel == 'Topic not assigned'} ? 'value-missing' : ''"
+                                  th:text="${item.topicLabel}">Topic not assigned</span>
+                        </div>
+                    </div>
+
+                    <div class="tag-section">
+                        <span class="metadata-label">Tags</span>
+                        <div class="tag-list" th:if="${!item.tagLabels.isEmpty()}">
+                            <span class="tag-chip"
+                                  th:each="tag : ${item.tagLabels}"
+                                  th:text="${tag}">Important</span>
+                        </div>
+                        <span class="empty-tag" th:if="${item.tagLabels.isEmpty()}">No tags assigned yet</span>
+                    </div>
+
+                    <div class="answer-section">
+                        <div class="question-actions">
+                            <button type="button"
+                                    class="check-answer-button"
+                                    aria-expanded="false"
+                                    onclick="const answerPanel = this.closest('.answer-section').querySelector('.answer-panel');
+                                             const willShow = answerPanel.hidden;
+                                             answerPanel.hidden = !willShow;
+                                             this.setAttribute('aria-expanded', String(willShow));
+                                             this.querySelector('.check-answer-label').textContent = willShow ? 'Hide answer' : 'Check answer';">
+                                <span class="check-answer-label">Check answer</span>
+                            </button>
+
+                            <a class="edit-question-button"
+                               th:href="@{/questions/{id}/edit(id=${item.id})}"
+                               th:attr="aria-label=|Edit question ${item.id}|">Edit question</a>
+                        </div>
+
+                        <div class="answer-panel" hidden>
+                            <span class="metadata-label">Answer</span>
+                            <span class="metadata-value"
+                                  th:classappend="${item.answerLabel == 'Answer not assigned'} ? 'value-missing' : ''"
+                                  th:text="${item.answerLabel}">Answer not assigned</span>
+                        </div>
+                    </div>
+
+                    <div class="question-card-bottom">
+                        <span class="record-note"><span class="record-note-dot"></span> JSON record loaded</span>
+                        <span class="card-id" th:text="|ID ${item.id}|">ID 1</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Full-size source image viewer (single instance for all question cards) -->
+        <div id="source-image-viewer"
+             class="source-image-viewer"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Full-size source image"
+             aria-hidden="true"
+             hidden>
+            <button type="button"
+                    class="source-image-viewer-close"
+                    aria-label="Close image viewer">×</button>
+
+            <div class="source-image-viewer-content">
+                <img id="source-image-viewer-image" src="" alt="">
+            </div>
+
+            <p class="source-image-viewer-help">Source image · Press Esc or click outside to close</p>
+        </div>
+
+        <script>
+            (function () {
+                const viewer = document.getElementById("source-image-viewer");
+                if (!viewer || viewer.dataset.initialized === "true") {
+                    return;
+                }
+                viewer.dataset.initialized = "true";
+
+                const viewerImage = document.getElementById("source-image-viewer-image");
+                const closeButton = viewer.querySelector(".source-image-viewer-close");
+                let previousTrigger = null;
+                let previousBodyOverflow = "";
+
+                function openViewer(button) {
+                    const preview = button.closest(".question-preview");
+                    const sourceImage = preview && preview.querySelector(".preview-canvas img");
+
+                    if (!sourceImage || sourceImage.hidden || !sourceImage.src || button.disabled) {
+                        return;
+                    }
+
+                    previousTrigger = button;
+                    previousBodyOverflow = document.body.style.overflow;
+                    viewerImage.src = sourceImage.currentSrc || sourceImage.src;
+                    viewerImage.alt = sourceImage.alt || "Question source image";
+                    viewer.hidden = false;
+                    viewer.setAttribute("aria-hidden", "false");
+                    document.body.style.overflow = "hidden";
+                    closeButton.focus();
+                }
+
+                function closeViewer() {
+                    if (viewer.hidden) {
+                        return;
+                    }
+
+                    viewer.hidden = true;
+                    viewer.setAttribute("aria-hidden", "true");
+                    viewerImage.removeAttribute("src");
+                    document.body.style.overflow = previousBodyOverflow;
+
+                    if (previousTrigger && !previousTrigger.disabled && document.contains(previousTrigger)) {
+                        previousTrigger.focus();
+                    }
+                    previousTrigger = null;
+                }
+
+                document.addEventListener("click", function (event) {
+                    const imageButton = event.target.closest(".preview-image-button");
+                    if (imageButton) {
+                        event.preventDefault();
+                        openViewer(imageButton);
+                    }
+                });
+
+                closeButton.addEventListener("click", closeViewer);
+
+                viewer.addEventListener("click", function (event) {
+                    if (event.target === viewer) {
+                        closeViewer();
+                    }
+                });
+
+                document.addEventListener("keydown", function (event) {
+                    if (viewer.hidden) {
+                        return;
+                    }
+
+                    if (event.key === "Escape") {
+                        event.preventDefault();
+                        closeViewer();
+                    } else if (event.key === "Tab") {
+                        // The close button is the only interactive control in this dialog.
+                        event.preventDefault();
+                        closeButton.focus();
+                    }
+                });
+            })();
+        </script>
+
+        <div class="empty-state" th:if="${items.isEmpty()}">
+            <div class="empty-state-icon"><svg viewBox="0 0 24 24"><path d="M5 4.75A2.75 2.75 0 0 1 7.75 2H20v17H7.75A2.75 2.75 0 0 0 5 21.75z"/><path d="M5 4.75v17M8.5 6H16M8.5 9.5H16"/></svg></div>
+            <h3>Your library is waiting for its first question</h3>
+            <p>No questions were loaded. Check that <code>question-bank.JSON-directory</code> points to the folder containing your question JSON files.</p>
+        </div>
+
+        <div class="library-footnote" th:if="${!items.isEmpty()}">
+            <span class="footnote-mark">i</span>
+            <p>This is the read-only library view. Filtering, sorting controls, five-question pagination and editing will be added as the next steps.</p>
+        </div>
+    </section>
+</section>

@@ -12,7 +12,7 @@ public class ImageWebConfig implements WebMvcConfigurer {
 
     private final String imageLocation;
 
-    public ImageWebConfig(@Value("${question-bank.images-directory") String imagesDirectory) {
+    public ImageWebConfig(@Value("${question-bank.images-directory}") String imagesDirectory) {
         Path path = Path.of(imagesDirectory);
         String uri = path.toUri().toString();
         this.imageLocation = uri.endsWith("/") ? uri : uri + "/";
