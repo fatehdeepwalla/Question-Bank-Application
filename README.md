@@ -1,2 +1,7 @@
 # Question-Bank-Application
-A Personal Spring Boot Project created to help myself with the preparation of GATE CSE Examination.
+- I built this application to support my preparation for the GATE Computer Science Examination.
+- It brings previous-year questions together in single, organized collection.
+- Tag questions as Solved, Repeated, Important, or Very Important.
+- Filter questions by tags, year, subject, or topic (kind of sub-topic within Subject).
+- Sort questions by question ID or year.
+
