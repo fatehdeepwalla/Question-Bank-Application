@@ -1,0 +1,42 @@
+<section th:fragment="Pagination">
+    <nav class="pagination-panel"
+         aria-label="Question pagination"
+         th:if="${totalFilteredCount > 0}">
+        <div class="pagination-summary">
+                <span class="pagination-showing"
+                      th:text="|Showing ${pageStart}–${pageEnd} of ${totalFilteredCount} questions|">
+                    Showing 1–5 of 12 questions
+                </span>
+            <span class="pagination-page-count"
+                  th:text="|Page ${currentPage} of ${totalPages}|">
+                    Page 1 of 3
+                </span>
+        </div>
+
+        <div class="pagination-controls">
+            <a th:if="${hasPreviousPage}"
+               class="pagination-button pagination-previous"
+               th:href="${previousPageUrl}"
+               rel="prev">
+                <span aria-hidden="true">←</span> Previous
+            </a>
+            <span th:unless="${hasPreviousPage}"
+                  class="pagination-button is-disabled"
+                  aria-disabled="true">
+                    <span aria-hidden="true">←</span> Previous
+                </span>
+
+            <a th:if="${hasNextPage}"
+               class="pagination-button pagination-next"
+               th:href="${nextPageUrl}"
+               rel="next">
+                Next <span aria-hidden="true">→</span>
+            </a>
+            <span th:unless="${hasNextPage}"
+                  class="pagination-button is-disabled"
+                  aria-disabled="true">
+                    Next <span aria-hidden="true">→</span>
+                </span>
+        </div>
+    </nav>
+</section>

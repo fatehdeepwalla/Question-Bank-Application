@@ -625,3 +625,109 @@ button, input, select { font: inherit; }
         transition: none;
     }
 }
+
+/* ==========================================
+   QUESTION PAGINATION
+   ========================================== */
+.pagination-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 17px;
+    padding: 16px 18px;
+    border: 1px solid #e8eaf2;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, .88);
+    box-shadow: 0 5px 18px rgba(31, 39, 72, .035);
+}
+
+.pagination-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.pagination-showing {
+    color: #555e74;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.pagination-page-count {
+    color: #969caf;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pagination-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 36px;
+    padding: 0 13px;
+    border: 1px solid #e4e6f0;
+    border-radius: 9px;
+    color: #596178;
+    background: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color .18s ease, background .18s ease,
+    color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.pagination-button:not(.is-disabled):hover {
+    transform: translateY(-1px);
+    border-color: #d5cffb;
+    color: #6658d8;
+    background: #f7f5ff;
+    box-shadow: 0 4px 10px rgba(81, 68, 157, .07);
+}
+
+.pagination-button.is-disabled {
+    color: #b5b9c6;
+    border-color: #eceef4;
+    background: #f7f8fb;
+    cursor: not-allowed;
+}
+
+.pagination-button:focus-visible {
+    outline: 3px solid rgba(116, 102, 241, .22);
+    outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+    .pagination-panel {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 13px;
+        padding: 14px;
+    }
+
+    .pagination-controls {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pagination-button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pagination-button {
+        transition: none;
+    }
+}

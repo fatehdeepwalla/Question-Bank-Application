@@ -1,4 +1,3 @@
-
 package org.example.questionBankApplication.web.controllerAndHelpers;
 
 import org.example.questionBankApplication.model.Question;
@@ -6,15 +5,14 @@ import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.subject_topic.Subject;
 import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
 import org.example.questionBankApplication.model.subject_topic.Topic;
-
 import org.example.questionBankApplication.web.QuestionService;
 import org.example.questionBankApplication.web.ViewDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +20,16 @@ import java.util.Map;
 @Controller
 public class QuestionController {
 
+    private static final int PAGE_SIZE = 5;
+
     private final QuestionService questionService;
     private final QuestionQueryService questionQueryService;
     private final QuestionStatisticsService statisticsService;
 
-    public QuestionController(QuestionService questionService, QuestionQueryService questionQueryService, QuestionStatisticsService statisticsService) {
+    public QuestionController(
+            QuestionService questionService,
+            QuestionQueryService questionQueryService,
+            QuestionStatisticsService statisticsService) {
         this.questionService = questionService;
         this.questionQueryService = questionQueryService;
         this.statisticsService = statisticsService;
@@ -40,18 +43,38 @@ public class QuestionController {
         // Retrieve the existing JSON-backed collection.
         List<Question> allQuestions = questionService.findAll();
 
-        // Apply the submitted filters and sorting criteria.
+        // Apply the submitted filters and sorting before dividing results into pages.
         List<Question> filteredQuestions = questionQueryService.filterAndSort(allQuestions, filter);
-
-        // Statistics always describe the filtered collection.
         List<ViewDTO> filteredItems = filteredQuestions.stream().map(ViewDTO::new).toList();
+
+        // Statistics always describe the full filtered collection, not just the current page.
         model.addAllAttributes(statisticsService.calculate(filteredItems));
 
+        int totalFilteredCount = filteredItems.size();
+        int totalPages = totalFilteredCount / PAGE_SIZE
+                + (totalFilteredCount % PAGE_SIZE == 0 ? 0 : 1);
+        int requestedPage = parseRequestedPage(parameters.get("page"));
 
-        model.addAttribute("items", filteredItems);
+        // There are no pages when the filtered collection is empty. Otherwise, clamp
+        // out-of-range page requests to the last available page.
+        int currentPage = totalPages == 0 ? 1 : Math.min(requestedPage, totalPages);
+        int fromIndex = Math.min((currentPage - 1) * PAGE_SIZE, totalFilteredCount);
+        int toIndex = Math.min(fromIndex + PAGE_SIZE, totalFilteredCount);
+        List<ViewDTO> pageItems = filteredItems.subList(fromIndex, toIndex);
+
+        model.addAttribute("items", pageItems);
         model.addAttribute("totalCount", allQuestions.size());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("pageSize", PAGE_SIZE);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageStart", totalFilteredCount == 0 ? 0 : fromIndex + 1);
+        model.addAttribute("pageEnd", toIndex);
+        model.addAttribute("hasPreviousPage", currentPage > 1 && totalPages > 0);
+        model.addAttribute("hasNextPage", currentPage < totalPages);
+        model.addAttribute("previousPageUrl", buildPageUrl(parameters, currentPage - 1));
+        model.addAttribute("nextPageUrl", buildPageUrl(parameters, currentPage + 1));
 
-        // Preserve selected criteria in the form.
+        // Preserve selected criteria in the filter form.
         model.addAttribute("selectedYear", filter.getSelectedYear());
         model.addAttribute("selectedSubject", filter.getSelectedSubject());
         model.addAttribute("selectedTopic", filter.getSelectedTopic());
@@ -71,6 +94,35 @@ public class QuestionController {
             subjectTopicOptions.put(subject.name(), topics);
         }
         model.addAttribute("subjectTopicOptions", subjectTopicOptions);
+
         return "list";
+    }
+
+    private int parseRequestedPage(String rawPage) {
+        try {
+            int page = Integer.parseInt(rawPage);
+            return page >= 1 ? page : 1;
+        } catch (NumberFormatException exception) {
+            return 1;
+        }
+    }
+
+    /**
+     * Builds a pagination URL while retaining the currently submitted filters
+     * and sorting options. The existing page value is replaced, not duplicated.
+     */
+    private String buildPageUrl(Map<String, String> parameters, int page) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/questions");
+
+        parameters.forEach((name, value) -> {
+            if (!"page".equals(name) && value != null) {
+                builder.queryParam(name, value);
+            }
+        });
+
+        return builder.queryParam("page", Math.max(1, page))
+                .build()
+                .encode()
+                .toUriString();
     }
 }
