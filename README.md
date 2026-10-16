@@ -1,15 +1,20 @@
 # Question Bank Application
-
-A **GATE Computer Science (CSE) previous-year question organizer** built to make exam preparation more structured. I created this project while preparing for GATE so I could keep questions in one place, classify them by topic, and quickly revisit solved, repeated, and important questions.
+- I built this application to support my preparation for the **GATE Computer Science Examination**.
+- It brings previous-year questions together in single, organized collection.
+- Tag questions as Solved, Repeated, Important, or Very Important.
+- Filter questions by tags, year, subject, or topic (kind of sub-topic within Subject).
+- Sort questions by question ID or year.
 
 ![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?logo=springboot&logoColor=white)
 ![Thymeleaf](https://img.shields.io/badge/Template%20Engine-Thymeleaf-005F0F?logo=thymeleaf&logoColor=white)
 ![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)
 
+---
+
 ## Why I Built It
 
-During GATE preparation, I wanted a single, organized place to work through previous-year questions instead of managing question images and revision notes as a scattered collection. This application combines image-based questions with searchable metadata, revision tags, and editing tools.
+There are other online sites which provide for previous year question bank, but i 
 
 ## Features
 
@@ -24,20 +29,20 @@ During GATE preparation, I wanted a single, organized place to work through prev
 
 ## Tech Stack
 
-| Technology | Use |
-| --- | --- |
-| Java 17 | Application language |
-| Spring Boot 4.1.1 | Application setup and runtime |
-| Spring MVC | Request handling and controllers |
-| Thymeleaf | Server-rendered web pages |
-| Jackson | Reading and writing question JSON |
-| Maven Wrapper | Build and run commands |
-| JSON files and image assets | Local question data and question images |
+  | Technology | Use |
+  | --- | --- |
+  | Java 17 | Application language |
+  | Spring Boot 4.1.1 | Application setup and runtime |
+  | Spring MVC | Request handling and controllers |
+  | Thymeleaf | Server-rendered web pages |
+  | Jackson | Reading and writing question JSON |
+  | Maven Wrapper | Build and run commands |
+  | JSON files and image assets | Local question data and question images |
 
 ## How It Works
 
-1. Each question has a JSON metadata file in \`JSON_Files/\`, named \`question-<id>.json\`.
-2. The associated question image is stored in \`Question_Images/\`.
+1. Each question has a JSON metadata file, named `question-<id>.json` in `JSON_Files/`.
+2. The associated question image is stored in `Question_Images/`.
 3. When the application starts, it reads the JSON records into the question catalog.
 4. Spring MVC applies the requested filters and sorting, then renders the results with Thymeleaf.
 5. When a question is edited, the application validates the submitted metadata and writes the updated record to its JSON file.
@@ -55,42 +60,28 @@ The project uses **file-based storage**, so a separate database setup is not req
 
 Clone the repository and move into the project directory:
 
-\`\`\`bash
+```bash
 git clone https://github.com/fatehdeepwalla/Question-Bank-Application.git
 cd Question-Bank-Application
-\`\`\`
+```
 
 On **macOS/Linux**, start the application with the Maven Wrapper:
 
-\`\`\`bash
+```bash
 ./mvnw spring-boot:run
-\`\`\`
+```
 
 On **Windows**, run:
 
-\`\`\`powershell
+```powershell
 .\mvnw.cmd spring-boot:run
-\`\`\`
+```
 
 Once startup is complete, open [http://localhost:8080/questions](http://localhost:8080/questions) in your browser.
 
-### Run Tests
-
-macOS/Linux:
-
-\`\`\`bash
-./mvnw test
-\`\`\`
-
-Windows:
-
-\`\`\`powershell
-.\mvnw.cmd test
-\`\`\`
-
 ## Project Structure
 
-\`\`\`text
+```text
 Question-Bank-Application/
 ├── JSON_Files/                   # Question metadata, one JSON file per question
 ├── Question_Images/              # Image assets for questions
@@ -109,7 +100,7 @@ Question-Bank-Application/
 ├── pom.xml
 ├── mvnw
 └── mvnw.cmd
-\`\`\`
+```
 
 ## Question Data
 
@@ -121,7 +112,7 @@ Question metadata includes an ID, image path, year, subject, topic, question typ
 
 Example metadata shape:
 
-\`\`\`json
+```json
 {
   "id": 1,
   "imagePath": "Question_Images/example.png",
@@ -138,7 +129,7 @@ Example metadata shape:
     "REPEATED"
   ]
 }
-\`\`\`
+```
 
 This is an example of the data format; actual records and image paths are in the repository.
 
