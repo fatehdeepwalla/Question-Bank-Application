@@ -1,8 +1,8 @@
 # Question Bank Application
 - I built this application to support my preparation for the **GATE Computer Science Examination**.
 - It brings previous-year questions together in single, organized collection.
-- Tag questions as Solved, Repeated, Important, or Very Important.
-- Filter questions by tags, year, subject, or topic (kind of sub-topic within Subject).
+- Tag questions as **Solved**, **Repeated**, **Important**, or **Very Important**.
+- Filter questions by **tags**, **year**, **subject**, or **topic** (kind of sub-topic within Subject).
 - Sort questions by question ID or year.
 
 ![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
@@ -14,7 +14,17 @@
 
 ## Why I Built It
 
-There are other online sites which provide for previous year question bank, but i 
+- Several online platforms already offer GATE previous-year question banks, allowing users to filter questions by subject and topic (a subtopic within a subject).
+- One such site is [practicepaper.in](https://practicepaper.in/).  
+- While preparing for GATE Computer Science, I found that working through more than 3,000 previous-year questions could take nearly two months.
+- Effective preparation also requires revisiting questions during revision.
+- However, repeatedly working through the entire question set can be time-consuming, especially when many questions test similar concepts.
+- I wanted a way to make this revision process more efficient.
+- I built this application to let me mark questions as Solved, Repeated, Important, or Very Important. This helps me track my progress, identify repetitive questions, prioritize important ones.
+- **The goal is to save time and make revision more focused, rather than brute force appraoch of repeatedly solving the entire question set from scratch.**
+- I retained the standard filtering features by year, subject, and topic, while adding revision-focused features to make question practice more efficient.
+
+---
 
 ## Features
 
