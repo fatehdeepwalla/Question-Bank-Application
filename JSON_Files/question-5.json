@@ -4,7 +4,7 @@
   "year" : -9999,
   "subject" : null,
   "topic" : null,
-  "questionTags" : null,
   "type" : null,
-  "answer" : null
+  "answer" : null,
+  "questionTags" : null
 }
