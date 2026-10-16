@@ -31,7 +31,7 @@ class JsonPersistenceIntegrationTest {
         List<Question> loaded = JSON_Reader.readQuestions(directory);
 
         assertEquals(1, loaded.size());
-        Question actual = loaded.getFirst();
+        Question actual = loaded.get(0);
         assertEquals(original.getId(), actual.getId());
         assertEquals(original.getImagePath(), actual.getImagePath());
         assertEquals(2022, actual.getYear());
@@ -55,7 +55,7 @@ class JsonPersistenceIntegrationTest {
         updated.setMcqAnswer(AnswerOption.D);
         JSON_Writer.writeQuestion(updated, directory);
 
-        Question persisted = JSON_Reader.readQuestions(directory).getFirst();
+        Question persisted = JSON_Reader.readQuestions(directory).get(0);
         assertEquals(2023, persisted.getYear());
         assertEquals(AnswerOption.D,
                 ((org.example.questionBankApplication.model.answer.MCQ_Answer) persisted.getAnswer())
