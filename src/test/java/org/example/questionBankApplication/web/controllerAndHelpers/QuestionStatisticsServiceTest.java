@@ -5,7 +5,6 @@ import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.AnswerOption;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
-import org.example.questionBankApplication.web.QuestionStatisticsService;
 import org.example.questionBankApplication.web.ViewDTO;
 import org.junit.jupiter.api.Test;
 
