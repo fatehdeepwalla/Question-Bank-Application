@@ -13,7 +13,6 @@
 ![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)
 
 ---
-
 ## Why I Built It
 
 - Several online platforms already offer GATE previous-year question banks, allowing users to filter questions by subject and topic (a subtopic within a subject).
@@ -28,7 +27,6 @@
 
 
 ---
-
 ## Features
 
 - **Organized question library:** Displays questions using their associated images, with metadata for year, subject, topic, question type, answer, and tags.
@@ -41,19 +39,18 @@
 - **Persistent local storage:** Question metadata is stored in individual JSON files. Changes made through the editor are saved to the corresponding file, so they remain available after restarting the application.
 
 ---
-
 ## Tech Stack
 
-  | Technology | Use |
+  | Technology | Role |
   | --- | --- |
-  | Java 17 | Application language |
-  | Spring Boot 4.1.1 | Application setup and runtime |
-  | Spring MVC | Request handling and controllers |
-  | Thymeleaf | Server-rendered web pages |
-  | Jackson | Reading and writing question JSON |
-  | Maven Wrapper | Build and run commands |
-  | JSON files and image assets | Local question data and question images |
+  | Java 17 | Main programming language |
+  | Spring Boot 4.1.1 | Application framework |
+  | Spring MVC | Handles HTTP requests and routes them to controllers |
+  | Thymeleaf | Renders server-side HTML pages |
+  | Jackson Databind | Reads and writes question metadata in JSON format |
+  | Maven Wrapper | Builds and runs the application using Maven commands |
 
+---
 ## How It Works
 
 1. Each question has a JSON metadata file, named `question-<id>.json` in `JSON_Files/`.
@@ -61,39 +58,38 @@
 3. When the application starts, it reads the JSON records into the question catalog.
 4. Spring MVC applies the requested filters and sorting, then renders the results with Thymeleaf.
 5. When a question is edited, the application validates the submitted metadata and writes the updated record to its JSON file.
+6. The project uses **file-based storage**, so a separate database setup is not required.
 
-The project uses **file-based storage**, so a separate database setup is not required.
-
+---
 ## Getting Started
 
-### Prerequisites
-
+**Prerequisites**
 - JDK 17 or later
-- Git
+- maven wrapper is included in project
 
-### Run the Application
+**Run the Application**
 
-Clone the repository and move into the project directory:
+- Clone the repository and move into the project directory:
+  
+  ```bash
+  git clone https://github.com/fatehdeepwalla/Question-Bank-Application.git
+  cd Question-Bank-Application
+  ```
+  
+- On **macOS/Linux**, start the application with the Maven Wrapper:
+  
+  ```bash
+  ./mvnw spring-boot:run
+  ```
+  
+- On **Windows**, run:
+  ```powershell
+  .\mvnw.cmd spring-boot:run
+  ```
+  
+- Once startup is complete, open [http://localhost:8080/questions](http://localhost:8080/questions) in your browser.
 
-```bash
-git clone https://github.com/fatehdeepwalla/Question-Bank-Application.git
-cd Question-Bank-Application
-```
-
-On **macOS/Linux**, start the application with the Maven Wrapper:
-
-```bash
-./mvnw spring-boot:run
-```
-
-On **Windows**, run:
-
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
-Once startup is complete, open [http://localhost:8080/questions](http://localhost:8080/questions) in your browser.
-
+---
 ## Project Structure
 
 ```text
@@ -117,37 +113,44 @@ Question-Bank-Application/
 └── mvnw.cmd
 ```
 
+---
 ## Question Data
+- Each question is represented by a JSON metadata file containing its ID, image path, year, subject, topic, question type, answer, and tags.
+  
+- **Subject and Topic Relationship** : Each topic is associated with a subject. For example, `Relation` is a topic under `Discrete_Mathematics`. The subject and topic must correspond to the application's subject-topic mapping.
+  
+- **Question Type and Answer Relationship**
+  - The structure of the `answer` field depends on the question's `type`. The application supports three GATE-style question types:
+  - **MCQ (Multiple Choice Question):** Stores a single correct option using `correctOption`.
+  - **MSQ (Multiple Select Question):** Stores multiple correct options using `correctOptions`.
+  - **NAT (Numerical Answer Type):** Stores an accepted numerical range using `minValue` and `maxValue`.
+  - The answer data must match the question type. For example, an MCQ uses `correctOption`, whereas an MSQ uses `correctOptions`.
+    
+- **Example JSON Metadata**
+  
+  ```json
+  {
+    "id": 1,
+    "imagePath": "Question_Images/example.png",
+    "year": 2021,
+    "subject": "Digital_Logic",
+    "topic": "Combinational_Circuit",
+    "type": "MCQ",
+    "answer": {
+      "correctOption": "B"
+    },
+    "questionTags": [
+      "IMPORTANT",
+      "VERY_IMPORTANT",
+      "REPEATED"
+    ]
+  }
+  ```
+  
+   > This example illustrates an MCQ question under the `Combinational_Circuit` topic of `Digital_Logic`. Actual question records and their corresponding images are available in the repository.
 
-Question metadata includes an ID, image path, year, subject, topic, question type, answer, and tags. The application supports these GATE-style answer formats:
 
-- **MCQ** — one correct option
-- **MSQ** — multiple correct options
-- **NAT** — a numeric answer represented by a minimum and maximum value
-
-Example metadata shape:
-
-```json
-{
-  "id": 1,
-  "imagePath": "Question_Images/example.png",
-  "year": 2021,
-  "subject": "Discrete_Mathematics",
-  "topic": "Relation",
-  "type": "MCQ",
-  "answer": {
-    "correctOption": "B"
-  },
-  "questionTags": [
-    "IMPORTANT",
-    "VERY_IMPORTANT",
-    "REPEATED"
-  ]
-}
-```
-
-This is an example of the data format; actual records and image paths are in the repository.
-
+---
 ## Future Scope
 
-Potential extensions include user accounts, cloud/database-backed storage, and richer revision or practice modes. The current version focuses on keeping the local GATE CSE question collection organized, editable, and easy to review.
+Potential extensions include user accounts, cloud/database-backed storage, and richer revision or practice modes. The current version focuses on keeping the local GATE CSE question collection organized and editable.
