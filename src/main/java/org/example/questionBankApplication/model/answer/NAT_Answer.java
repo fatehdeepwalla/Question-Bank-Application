@@ -9,7 +9,7 @@ public class NAT_Answer implements Answer {
     private double maxValue;
 
     public NAT_Answer(double minValue, double maxValue) {
-        validate(minValue, maxValue)
+        validate(minValue, maxValue);
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
