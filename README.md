@@ -2,8 +2,10 @@
 - I built this application to support my preparation for the **GATE Computer Science Examination**.
 - It brings previous-year questions together in single, organized collection.
 - Tag questions as **Solved**, **Repeated**, **Important**, or **Very Important**.
-- Filter questions by **tags**, **year**, **subject**, or **topic** (kind of sub-topic within Subject).
-- Sort questions by question ID or year.
+- Filter questions by **tags**, **year**, **subject**, or **topic** (kind of sub-topic within subject).
+- Sort questions by **question ID** or **year**.
+- Browse questions with pagination and edit their metadata.
+- Store question metadata in JSON files for persistence.
 
 ![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?logo=springboot&logoColor=white)
@@ -20,9 +22,10 @@
 - Effective preparation also requires revisiting questions during revision.
 - However, repeatedly working through the entire question set can be time-consuming, especially when many questions test similar concepts.
 - I wanted a way to make this revision process more efficient.
-- I built this application to let me mark questions as Solved, Repeated, Important, or Very Important. This helps me track my progress, identify repetitive questions, prioritize important ones.
+- I built this application to let me mark questions as Solved, Repeated, Important, or Very Important. This helps me track my progress, identify repetitive questions, prioritize important questions during revision.
 - **The goal is to save time and make revision more focused, rather than brute force appraoch of repeatedly solving the entire question set from scratch.**
-- I retained the standard filtering features by year, subject, and topic, while adding revision-focused features to make question practice more efficient.
+- I retained the standard filtering features by year, subject, and topic, while adding revision-focused tagging to make question practice more efficient.
+
 
 ---
 
@@ -31,11 +34,13 @@
 - **Organized question library:** Displays questions using their associated images, with metadata for year, subject, topic, question type, answer, and tags.
 - **Flexible filtering:** Narrow the collection by GATE year, subject, topic, and tag. Tag filters support including or excluding questions with a particular tag.
 - **Revision tags:** Mark questions as **Solved**, **Repeated**, **Important**, or **Very Important** to help prioritize revision.
-- **Sorting:** Sort questions by question ID or year, in ascending or descending order.
+- **Sorting:** Sort questions by **question ID** or **year**, in ascending or descending order.
 - **Question editing:** Update a question's year, subject/topic classification, question type, answer information, and tags from the web interface.
-- **Progress and data-quality statistics:** View counts for tagged and classified questions, as well as questions with missing metadata.
+- **Progress and data-quality statistics:** View counts for tagged, as well as questions with missing metadata.
 - **Pagination:** Browse the filtered results in smaller pages while retaining the selected filters and sorting options.
-- **Persistent local storage:** Question metadata is stored in individual JSON files. Changes made through the editor are saved to the corresponding file, so they remain available after restart.
+- **Persistent local storage:** Question metadata is stored in individual JSON files. Changes made through the editor are saved to the corresponding file, so they remain available after restarting the application.
+
+---
 
 ## Tech Stack
 
