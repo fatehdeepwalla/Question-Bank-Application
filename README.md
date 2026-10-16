@@ -65,7 +65,7 @@
 
 **Prerequisites**
 - JDK 17 or later
-- maven wrapper is included in project
+- Maven wrapper is included in project
 
 **Run the Application**
 
