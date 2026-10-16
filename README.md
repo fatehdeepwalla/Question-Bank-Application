@@ -47,7 +47,7 @@
   | Spring Boot 4.1.1 | Application framework |
   | Spring MVC | Handles HTTP requests and routes them to controllers |
   | Thymeleaf | Renders server-side HTML pages |
-  | Jackson Databind | Reads and writes question metadata in JSON format |
+  | Jackson | Reads and writes question metadata in JSON format |
   | Maven Wrapper | Builds and runs the application using Maven commands |
 
 ---
