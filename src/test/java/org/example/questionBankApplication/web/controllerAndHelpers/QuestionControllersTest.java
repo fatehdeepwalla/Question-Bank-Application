@@ -44,7 +44,7 @@ class QuestionControllersTest {
         }
         when(service.findAll()).thenReturn(questions);
         when(service.findById(anyInt())).thenAnswer(invocation -> questions.stream()
-                .filter(q -> q.getId() == invocation.getArgument(0))
+                .filter(q -> q.getId() == (Integer) invocation.getArgument(0))
                 .findFirst());
 
         QuestionController listController = new QuestionController(service,
