@@ -72,8 +72,9 @@ class QuestionControllersTest {
     void paginationClampsOutOfRangeAndRetainsFiltersInNavigationUrls() throws Exception {
         MvcResult result = mvc.perform(get("/questions")
                         .param("page", "99")
-                        .param("year", "2021")
-                        .param("tag_SOLVED", "include"))
+                        .param("sortBy", "id")
+                        .param("direction", "desc")
+                        .param("tag_SOLVED", "neutral"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("currentPage", 3))
                 .andExpect(model().attribute("pageStart", 11))
@@ -82,8 +83,9 @@ class QuestionControllersTest {
 
         String nextUrl = (String) result.getModelAndView().getModel().get("nextPageUrl");
         String previousUrl = (String) result.getModelAndView().getModel().get("previousPageUrl");
-        assertTrue(nextUrl.contains("year=2021"));
-        assertTrue(nextUrl.contains("tag_SOLVED=include"));
+        assertTrue(nextUrl.contains("sortBy=id"));
+        assertTrue(nextUrl.contains("direction=desc"));
+        assertTrue(nextUrl.contains("tag_SOLVED=neutral"));
         assertTrue(nextUrl.contains("page=4"));
         assertTrue(previousUrl.contains("page=2"));
         assertFalse(previousUrl.contains("page=99"));
@@ -91,7 +93,7 @@ class QuestionControllersTest {
 
     @Test
     void invalidPageFallsBackToFirstPageAndEmptyFilterHasNoResults() throws Exception {
-        mvc.perform(get("/questions").param("page", "-2").param("year", "nonsense"))
+        mvc.perform(get("/questions").param("page", "-2").param("tag_VERY_IMPORTANT", "include"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("currentPage", 1))
                 .andExpect(model().attribute("totalPages", 0))
