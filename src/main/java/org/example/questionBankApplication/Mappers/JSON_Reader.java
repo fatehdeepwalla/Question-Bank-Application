@@ -76,6 +76,14 @@ public final class JSON_Reader {
 
         // Read {id, imagePath, year}
         int id = readInt(root, "id");
+        String actualFileName = jsonFile.getFileName().toString();
+        String expectedFileName = "question-" + id + ".json";
+        if (!expectedFileName.equals(actualFileName)) {
+            throw new IOException("Filename '" + actualFileName
+                    + "' does not match embedded question ID " + id
+                    + " (expected '" + expectedFileName + "')");
+        }
+
         String imagePath = readString(root, "imagePath");
         int year = readInt(root, "year");
 
