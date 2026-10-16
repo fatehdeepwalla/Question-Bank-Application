@@ -21,7 +21,7 @@ public class NAT_Answer implements Answer {
     public double getMaxValue() {return maxValue;}
 
     public void setRange(double minValue, double maxValue) {
-        validate(minValue, maxValue)
+        validate(minValue, maxValue);
         this.minValue = minValue;
         this.maxValue = maxValue;
     }

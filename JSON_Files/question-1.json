@@ -8,5 +8,5 @@
   "answer" : {
     "correctOption" : "B"
   },
-  "questionTags" : [ "IMPORTANT", "REPEATED", "SOLVED" ]
+  "questionTags" : [ "IMPORTANT", "VERY_IMPORTANT", "REPEATED" ]
 }
