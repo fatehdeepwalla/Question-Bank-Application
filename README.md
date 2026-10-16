@@ -23,7 +23,7 @@
 - I wanted a way to make this revision process more efficient.
 - I built this application to let me mark questions as Solved, Repeated, Important, or Very Important. This helps me track my progress, identify repetitive questions, prioritize important questions during revision.
 - **The goal is to save time and make revision more focused, rather than taking a brute-force appraoch of repeatedly solving the entire question set from scratch.**
-- I retained the standard filtering features by year, subject, and topic, while adding revision-focused tagging to make question practice more efficient.
+- I retained the standard filtering features by year, subject, and topic, while adding revision-focused tagging for my own preparation.
 
 
 ---
