@@ -1,9 +1,90 @@
+
 <section th:fragment="Footer">
+
+    <section class="project-story" aria-labelledby="project-story-title">
+        <div class="project-story-header">
+            <span class="project-story-kicker">THE STORY BEHIND THE PROJECT</span>
+            <h2 id="project-story-title">Why I Built It</h2>
+
+            <p class="project-story-intro">
+                Several online platforms already offer GATE previous-year question banks,
+                allowing users to filter questions by subject and topic (a subtopic within a subject).
+                One such site is
+                <a href="https://practicepaper.in/"
+                   target="_blank"
+                   rel="noopener noreferrer">practicepaper.in</a>.
+            </p>
+        </div>
+
+        <div class="project-story-grid">
+            <div class="project-story-column">
+                <h3>The Challenge</h3>
+
+                <p>
+                    While preparing for GATE Computer Science,
+                    I found that working through more than 3,000 previous-year
+                    questions could take nearly two months.
+                </p>
+                <p>
+                    Effective preparation also requires revisiting questions during revision.
+                </p>
+                <p>
+                    However, repeatedly working through the entire question set
+                    can be time-consuming, especially when many questions test similar concepts.
+                </p>
+            </div>
+
+            <div class="project-story-column">
+                <h3>My Approach</h3>
+
+                <p>
+                    I wanted a way to make this revision process more efficient.
+                </p>
+                <p>
+                    I built this application to let me mark questions with tags shown below.
+                    This helps me track my progress, identify repetitive questions, prioritize important questions during revision.
+                </p>
+                <p>
+                    I retained the standard filtering features by year, subject, and topic,
+                    while adding revision-focused tagging for my own preparation.
+                </p>
+
+
+                <ul class="project-story-tag-list">
+                    <li><strong>Solved</strong> — track progress</li>
+                    <li><strong>Repeated</strong> — flag repetitive questions</li>
+                    <li><strong>Important</strong> — prioritize revision</li>
+                    <li><strong>Very Important</strong> — highlight key questions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="project-story-goal">
+            <span aria-hidden="true">✦</span>
+            <p>
+                <strong>The goal:</strong>
+                is to save time and make revision more focused,
+                rather than taking a brute-force appraoch of
+                repeatedly solving the entire question set from scratch.
+            </p>
+        </div>
+    </section>
+
     <footer class="page-footer">
-        <span><span class="footer-mark">Q</span> Question Bank<span class="footer-separator">|</span>GATE CSE PYQs</span>
+        <span>
+            <span class="footer-mark">Q</span>
+            Question Bank
+            <span class="footer-separator">|</span>
+            GATE CSE PYQs
+        </span>
+
         <div class="sort-note">
             <span class="sort-note-icon" aria-hidden="true">✦</span>
-            <span><strong>Consistency and Discipline</strong> <small>are keys to Victory</small></span>
+            <span>
+                <strong>Consistency and Discipline</strong>
+                <small>are keys to Victory</small>
+            </span>
         </div>
     </footer>
+
 </section>
