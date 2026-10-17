@@ -1,10 +1,13 @@
 {
   "id" : 7,
   "imagePath" : "Question_Images\\Screenshot 2026-10-14 202619.png",
-  "year" : -9999,
-  "subject" : null,
-  "topic" : null,
-  "type" : null,
-  "answer" : null,
-  "questionTags" : null
+  "year" : 1995,
+  "subject" : "Discrete_Mathematics",
+  "topic" : "Group_Theory",
+  "type" : "NAT",
+  "answer" : {
+    "minValue" : 58.0,
+    "maxValue" : 549.0
+  },
+  "questionTags" : [ "IMPORTANT" ]
 }
