@@ -3,6 +3,9 @@ package org.example.questionBankApplication.web;
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.AnswerOption;
+import org.example.questionBankApplication.model.answer.MCQ_Answer;
+import org.example.questionBankApplication.model.answer.MSQ_Answer;
+import org.example.questionBankApplication.model.answer.NAT_Answer;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.junit.jupiter.api.Test;
@@ -18,21 +21,19 @@ class QuestionDTOTest {
     void formatsQuestionIdAndNormalizesWindowsImagePaths() {
         Question question = new Question(12,
                 "Question_Images\\Screenshot 2026-10-14 202530.png",
-                2021, Topic.Graph_Theory, Type.MCQ, null, Set.of());
-        question.setMcqAnswer(AnswerOption.B);
+                2021, Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.B), Set.of());
 
         QuestionDTO view = new QuestionDTO(question);
 
         assertEquals("QB-0012", view.getIdLabel());
-        assertEquals("/question-images/Screenshot%202026-10-14%20202530.png",
+        assertEquals("/images-folder/Screenshot%202026-10-14%20202530.png",
                 view.getImageUrl());
     }
 
     @Test
     void exposesMcqAnswerAndClassifiedStatus() {
         Question question = new Question(1, "q1.png", 2021,
-                Topic.Graph_Theory, Type.MCQ, null, Set.of(Tag.SOLVED));
-        question.setMcqAnswer(AnswerOption.C);
+                Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.C), Set.of(Tag.SOLVED));
 
         QuestionDTO view = new QuestionDTO(question);
 
@@ -49,12 +50,10 @@ class QuestionDTOTest {
     @Test
     void formatsMsqAndNatAnswers() {
         Question msq = new Question(2, "q2.png", 2021,
-                Topic.SQL, Type.MSQ, null, Set.of());
-        msq.setMsqAnswer(Set.of(AnswerOption.D, AnswerOption.B));
+                Topic.SQL, Type.MSQ, new MSQ_Answer(Set.of(AnswerOption.D, AnswerOption.B)), Set.of());
 
         Question nat = new Question(3, "q3.png", 2021,
-                Topic.SQL, Type.NAT, null, Set.of());
-        nat.setNatAnswer(2.5, 3.5);
+                Topic.SQL, Type.NAT, new NAT_Answer(2.5, 3.5), Set.of());
 
         assertEquals("B, D", new QuestionDTO(msq).getAnswerLabel());
         assertEquals("2.5 – 3.5", new QuestionDTO(nat).getAnswerLabel());
@@ -66,8 +65,8 @@ class QuestionDTOTest {
         tagsWithNull.add(Tag.REPEATED);
         tagsWithNull.add(null);
 
-        Question question = new Question(4, " ", 0,
-                null, null, null, tagsWithNull);
+        Question question = new Question(4, "Question_Images/q4.png");
+        question.setQuestionTags(tagsWithNull);
         QuestionDTO view = new QuestionDTO(question);
 
         assertEquals("Year not set", view.getYearLabel());
@@ -75,7 +74,7 @@ class QuestionDTOTest {
         assertEquals("Topic not assigned", view.getTopicLabel());
         assertEquals("Type not set", view.getTypeLabel());
         assertEquals("Answer not assigned", view.getAnswerLabel());
-        assertNull(view.getImageUrl());
+        assertEquals("/images-folder/q4.png", view.getImageUrl());
         assertFalse(view.isClassified());
         assertEquals("Needs details", view.getStatusLabel());
         assertEquals(Set.of("REPEATED"), Set.copyOf(view.getTagLabels()));
@@ -84,9 +83,9 @@ class QuestionDTOTest {
     @Test
     void encodesSpecialCharactersInImageFilename() {
         Question question = new Question(5, "Question_Images/question #5 (A).png",
-                2020, Topic.Graph_Theory, Type.MCQ, null, Set.of());
+                2020, Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.A), Set.of());
 
-        assertEquals("/question-images/question%20%235%20(A).png",
+        assertEquals("/images-folder/question%20%235%20(A).png",
                 new QuestionDTO(question).getImageUrl());
     }
 }

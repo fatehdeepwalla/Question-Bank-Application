@@ -19,7 +19,7 @@ class FilterTest {
         assertEquals("id", filter.getSortBy());
         assertEquals("asc", filter.getDirection());
         assertEquals(Filter.TagState.NEUTRAL, filter.getTagState(Tag.SOLVED));
-        assertTrue(filter.getValidationErrors().isEmpty());
+        assertTrue(filter.getValidationErrorsForView().isEmpty());
     }
 
     @Test
@@ -41,7 +41,7 @@ class FilterTest {
         assertEquals("desc", filter.getDirection());
         assertEquals(Filter.TagState.INCLUDE, filter.getTagState(Tag.SOLVED));
         assertEquals(Filter.TagState.EXCLUDE, filter.getTagState(Tag.REPEATED));
-        assertTrue(filter.getValidationErrors().isEmpty());
+        assertTrue(filter.getValidationErrorsForView().isEmpty());
     }
 
     @Test
@@ -55,7 +55,7 @@ class FilterTest {
         assertNull(filter.getYear());
         assertEquals("id", filter.getSortBy());
         assertEquals("asc", filter.getDirection());
-        assertEquals(3, filter.getValidationErrors().size());
+        assertEquals(3, filter.getValidationErrorsForView().size());
     }
 
     @Test
@@ -66,7 +66,7 @@ class FilterTest {
         ));
 
         assertNull(filter.getTopic());
-        assertTrue(filter.getValidationErrors().stream()
+        assertTrue(filter.getValidationErrorsForView().stream()
                 .anyMatch(message -> message.contains("does not belong")));
     }
 
@@ -77,7 +77,7 @@ class FilterTest {
         ));
 
         assertNull(filter.getTopic());
-        assertTrue(filter.getValidationErrors().stream()
+        assertTrue(filter.getValidationErrorsForView().stream()
                 .anyMatch(message -> message.contains("Select a valid subject")));
     }
 
@@ -86,7 +86,7 @@ class FilterTest {
         Filter filter = Filter.fromParameters(Map.of("tag_SOLVED", "maybe"));
 
         assertEquals(Filter.TagState.NEUTRAL, filter.getTagState(Tag.SOLVED));
-        assertTrue(filter.getValidationErrors().stream()
+        assertTrue(filter.getValidationErrorsForView().stream()
                 .anyMatch(message -> message.contains("Invalid state for tag SOLVED")));
     }
 }

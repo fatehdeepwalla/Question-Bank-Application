@@ -3,6 +3,7 @@ package org.example.questionBankApplication.web.listController;
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.AnswerOption;
+import org.example.questionBankApplication.model.answer.MCQ_Answer;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionService;
@@ -37,9 +38,8 @@ class ListControllersTest {
         questions = new ArrayList<>();
         for (int id = 1; id <= 11; id++) {
             Question question = new Question(id, "Question_Images/q" + id + ".png",
-                    2020 + id % 4, Topic.Graph_Theory, Type.MCQ, null,
+                    2020 + id % 4, Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.A),
                     id % 2 == 0 ? Set.of(Tag.SOLVED) : Set.of());
-            question.setMcqAnswer(AnswerOption.A);
             questions.add(question);
         }
         when(service.findAll()).thenReturn(questions);

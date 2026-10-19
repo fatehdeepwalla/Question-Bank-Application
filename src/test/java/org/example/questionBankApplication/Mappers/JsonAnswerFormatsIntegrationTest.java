@@ -25,8 +25,8 @@ class JsonAnswerFormatsIntegrationTest {
     @Test
     void roundTripsMsqAnswerAndTags() throws IOException {
         Question question = new Question(41, "Question_Images/msq.png", 2022,
-                Topic.SQL, Type.MSQ, null, Set.of(Tag.IMPORTANT));
-        question.setMsqAnswer(Set.of(AnswerOption.B, AnswerOption.D));
+                Topic.SQL, Type.MSQ, new MSQ_Answer(Set.of(AnswerOption.B, AnswerOption.D)),
+                Set.of(Tag.IMPORTANT));
 
         JSON_Writer.writeQuestions(List.of(question), directory);
         Question restored = JSON_Reader.readQuestions(directory).get(0);
@@ -40,8 +40,7 @@ class JsonAnswerFormatsIntegrationTest {
     @Test
     void roundTripsNatRange() throws IOException {
         Question question = new Question(42, "Question_Images/nat.png", 2023,
-                Topic.SQL, Type.NAT, null, Set.of(Tag.REPEATED));
-        question.setNatAnswer(-0.25, 10.75);
+                Topic.SQL, Type.NAT, new NAT_Answer(-0.25, 10.75), Set.of(Tag.REPEATED));
 
         JSON_Writer.writeQuestions(List.of(question), directory);
         Question restored = JSON_Reader.readQuestions(directory).get(0);
@@ -55,8 +54,7 @@ class JsonAnswerFormatsIntegrationTest {
 
     @Test
     void roundTripsAQuestionWithIncompleteMetadata() throws IOException {
-        Question question = new Question(43, "Question_Images/incomplete.png", 0,
-                null, null, null, null);
+        Question question = new Question(43, "Question_Images/incomplete.png");
 
         JSON_Writer.writeQuestions(List.of(question), directory);
         Question restored = JSON_Reader.readQuestions(directory).get(0);

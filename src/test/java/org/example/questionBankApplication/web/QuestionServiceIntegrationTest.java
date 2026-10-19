@@ -5,6 +5,7 @@ import org.example.questionBankApplication.Mappers.JSON_Writer;
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.AnswerOption;
+import org.example.questionBankApplication.model.answer.MCQ_Answer;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,11 +30,9 @@ class QuestionServiceIntegrationTest {
     @BeforeEach
     void setUp() throws IOException {
         Question first = new Question(8, "Question_Images/q8.png", 2021,
-                Topic.Graph_Theory, Type.MCQ, null, Set.of(Tag.IMPORTANT));
-        first.setMcqAnswer(AnswerOption.B);
+                Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.B), Set.of(Tag.IMPORTANT));
         Question second = new Question(2, "Question_Images/q2.png", 2020,
-                Topic.SQL, Type.MCQ, null, Set.of());
-        second.setMcqAnswer(AnswerOption.A);
+                Topic.SQL, Type.MCQ, new MCQ_Answer(AnswerOption.A), Set.of());
         JSON_Writer.writeQuestions(List.of(first, second), jsonDirectory);
 
         service = new QuestionService(jsonDirectory.toString());
@@ -50,8 +49,8 @@ class QuestionServiceIntegrationTest {
     @Test
     void updatePersistsToDiskAndPublishesUpdatedCatalog() throws IOException {
         Question updated = new Question(8, "Question_Images/q8.png", 2024,
-                Topic.Graph_Theory, Type.MCQ, null, Set.of(Tag.SOLVED, Tag.REPEATED));
-        updated.setMcqAnswer(AnswerOption.D);
+                Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.D),
+                Set.of(Tag.SOLVED, Tag.REPEATED));
 
         service.updateQuestion(updated);
 
@@ -66,7 +65,7 @@ class QuestionServiceIntegrationTest {
     @Test
     void rejectsUpdatingUnknownQuestionWithoutChangingCatalog() {
         Question unknown = new Question(999, "Question_Images/q999.png", 2024,
-                Topic.Graph_Theory, Type.MCQ, null, Set.of());
+                Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.A), Set.of());
 
         assertThrows(IllegalArgumentException.class, () -> service.updateQuestion(unknown));
         assertEquals(List.of(2, 8), service.findAll().stream().map(Question::getId).toList());

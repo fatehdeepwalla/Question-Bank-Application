@@ -2,6 +2,8 @@ package org.example.questionBankApplication.web.listController;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
+import org.example.questionBankApplication.model.answer.AnswerOption;
+import org.example.questionBankApplication.model.answer.MCQ_Answer;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ class QueryTest {
 
     private Question question(int id, int year, Topic topic, Set<Tag> tags) {
         return new Question(id, "Question_Images/q" + id + ".png", year, topic,
-                Type.MCQ, null, tags);
+                Type.MCQ, new MCQ_Answer(AnswerOption.A), tags);
     }
 
     @Test
@@ -74,7 +76,7 @@ class QueryTest {
     @Test
     void sortsByYearAndKeepsUnassignedYearsLast() {
         List<Question> questions = List.of(
-                question(1, 0, Topic.Graph_Theory, Set.of()),
+                new Question(1, "Question_Images/q1.png"),
                 question(4, 2022, Topic.Graph_Theory, Set.of()),
                 question(3, 2020, Topic.Graph_Theory, Set.of()),
                 question(2, 2022, Topic.Graph_Theory, Set.of())
@@ -93,7 +95,7 @@ class QueryTest {
 
     @Test
     void nullTagsDoNotBreakUnfilteredQueries() {
-        List<Question> questions = List.of(question(1, 2020, Topic.Graph_Theory, null));
+        List<Question> questions = List.of(new Question(1, "Question_Images/q1.png"));
 
         assertEquals(1, service.filterAndSort(questions,
                 Filter.fromParameters(Map.of())).size());

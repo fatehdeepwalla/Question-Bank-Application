@@ -3,6 +3,7 @@ package org.example.questionBankApplication.web.listController;
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.AnswerOption;
+import org.example.questionBankApplication.model.answer.MCQ_Answer;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionDTO;
@@ -20,8 +21,7 @@ class StatisticsServiceTest {
 
     private QuestionDTO classified(int id, Set<Tag> tags) {
         Question question = new Question(id, "q" + id + ".png", 2021,
-                Topic.Graph_Theory, Type.MCQ, null, tags);
-        question.setMcqAnswer(AnswerOption.A);
+                Topic.Graph_Theory, Type.MCQ, new MCQ_Answer(AnswerOption.A), tags);
         return new QuestionDTO(question);
     }
 

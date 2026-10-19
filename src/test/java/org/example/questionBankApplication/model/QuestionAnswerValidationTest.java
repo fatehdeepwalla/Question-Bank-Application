@@ -14,37 +14,59 @@ import static org.junit.jupiter.api.Assertions.*;
 class QuestionAnswerValidationTest {
 
     @Test
-    void questionTypeMustMatchProvidedAnswerImplementation() {
+    void constructorRejectsMismatchedOrMissingTypeAndAnswer() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Question(1, "q.png", 2021, Topic.Graph_Theory,
                         Type.MSQ, new MCQ_Answer(AnswerOption.A), Set.of()));
 
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(RuntimeException.class, () ->
                 new Question(2, "q.png", 2021, Topic.Graph_Theory,
                         null, new MCQ_Answer(AnswerOption.A), Set.of()));
+
+        assertThrows(RuntimeException.class, () ->
+                new Question(3, "q.png", 2021, Topic.Graph_Theory,
+                        Type.MCQ, null, Set.of()));
     }
 
     @Test
-    void changingQuestionTypeClearsPreviouslyStoredAnswer() {
-        Question question = new Question(3, "q.png", 2021, Topic.Graph_Theory,
-                Type.MCQ, null, Set.of());
-        question.setMcqAnswer(AnswerOption.A);
-
-        question.setTypeAndAnswer(Type.NAT);
-
-        assertNull(question.getAnswer());
-        assertEquals(Type.NAT, question.getType());
-    }
-
-    @Test
-    void answerSettersRejectWrongQuestionType() {
+    void setTypeAndAnswerChangesTypeAndAnswerTogether() {
         Question question = new Question(4, "q.png", 2021, Topic.Graph_Theory,
-                Type.MCQ, null, Set.of());
+                Type.MCQ, new MCQ_Answer(AnswerOption.A), Set.of());
 
-        assertThrows(IllegalStateException.class,
-                () -> question.setMsqAnswer(Set.of(AnswerOption.A, AnswerOption.B)));
-        assertThrows(IllegalStateException.class,
-                () -> question.setNatAnswer(1, 2));
+        question.setTypeAndAnswer(Type.NAT, new NAT_Answer(1, 2));
+
+        assertEquals(Type.NAT, question.getType());
+        NAT_Answer answer = assertInstanceOf(NAT_Answer.class, question.getAnswer());
+        assertEquals(1, answer.getMinValue());
+        assertEquals(2, answer.getMaxValue());
+    }
+
+    @Test
+    void setTypeAndAnswerRejectsMismatchedPairWithoutCorruptingQuestion() {
+        Question question = new Question(5, "q.png", 2021, Topic.Graph_Theory,
+                Type.MCQ, new MCQ_Answer(AnswerOption.A), Set.of());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> question.setTypeAndAnswer(Type.NAT, new MCQ_Answer(AnswerOption.B)));
+
+        assertEquals(Type.MCQ, question.getType());
+        assertEquals(AnswerOption.A,
+                ((MCQ_Answer) question.getAnswer()).getCorrectOption());
+    }
+
+    @Test
+    void setTypeAndAnswerRejectsNullValuesWithoutChangingExistingState() {
+        Question question = new Question(6, "q.png", 2021, Topic.Graph_Theory,
+                Type.MCQ, new MCQ_Answer(AnswerOption.A), Set.of());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> question.setTypeAndAnswer(null, new MCQ_Answer(AnswerOption.B)));
+        assertThrows(IllegalArgumentException.class,
+                () -> question.setTypeAndAnswer(Type.MCQ, null));
+
+        assertEquals(Type.MCQ, question.getType());
+        assertEquals(AnswerOption.A,
+                ((MCQ_Answer) question.getAnswer()).getCorrectOption());
     }
 
     @Test
