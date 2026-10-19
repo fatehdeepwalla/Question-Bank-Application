@@ -87,14 +87,6 @@ public class EditController {
         Set<Tag> tags = parseTags(form.getSelectedTags(), errors);
         Answer answer = parseAnswer(form, type, errors);
 
-        boolean completelyUnclassified =
-                isBlank(form.getYear())
-                && isBlank(form.getSubject())
-                && isBlank(form.getTopic())
-                && isBlank(form.getType())
-                && tags.isEmpty()
-                && !hasAnyAnswerInput(form);
-
         boolean fullyClassified =
                 year != UNASSIGNED_YEAR
                 && subject != null
@@ -103,11 +95,10 @@ public class EditController {
                 && answer != null
                 && tags != null;
 
-        if (errors.isEmpty() && !completelyUnclassified && !fullyClassified) {
+        if (errors.isEmpty() && !fullyClassified) {
             errors.add(
-                    "A question must either have all metadata fields empty "
-                    + "or be fully classified with a valid year, subject, topic, "
-                    + "question type, and answer. Partial classification is not allowed."
+                    "Complete the year, subject, topic, question type, and answer before saving. "
+                    + "Partially classified questions are not allowed."
             );
         }
 
@@ -119,12 +110,8 @@ public class EditController {
         Question updated;
         try {
             // ID and image path deliberately come from the stored record, not from the form.
-            if (completelyUnclassified) {
-                updated = new Question(original.getId(), original.getImagePath());
-            } else {
-                updated = new Question(original.getId(), original.getImagePath(), year,
-                        topic, type, answer, tags);
-            }
+            updated = new Question(original.getId(), original.getImagePath(), year,
+                    topic, type, answer, tags);
         } catch (IllegalArgumentException exception) {
             errors.add(exception.getMessage() == null
                     ? "The submitted question details are not valid."
@@ -201,19 +188,6 @@ public class EditController {
                     .toList());
         }
         return form;
-    }
-
-    private static boolean isBlank(String value) {
-        return value == null || value.isBlank();
-    }
-
-    private static boolean hasAnyAnswerInput(EditForm form) {
-        return !isBlank(form.getMcqCorrectOption())
-                || (form.getMsqCorrectOptions() != null
-                    && form.getMsqCorrectOptions().stream()
-                        .anyMatch(option -> !isBlank(option)))
-                || !isBlank(form.getNatMinValue())
-                || !isBlank(form.getNatMaxValue());
     }
 
     private int parseYear(String rawYear, List<String> errors) {
