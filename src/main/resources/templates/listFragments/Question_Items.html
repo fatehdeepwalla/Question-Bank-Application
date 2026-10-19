@@ -95,7 +95,7 @@
                             </button>
 
                             <a class="edit-question-button"
-                               th:href="@{/questions/{id}/edit(id=${item.id})}"
+                               th:href="@{/questions/{id}/edit(id=${item.id}, returnUrl=${returnUrl})}"
                                th:attr="aria-label=|Edit question ${item.id}|">Edit question</a>
                         </div>
 
