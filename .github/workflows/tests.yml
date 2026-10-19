@@ -2,7 +2,7 @@ name: Automated Tests
 
 on:
   push:
-    branches: [main, "tests/**"]
+    branches: [main, "tests/**", refactor]
   pull_request:
     branches: [main]
 
