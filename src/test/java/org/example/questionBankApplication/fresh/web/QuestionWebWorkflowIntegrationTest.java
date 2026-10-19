@@ -107,7 +107,7 @@ class QuestionWebWorkflowIntegrationTest {
         assertEquals(2, model.get("totalPages"));
         assertEquals(1, model.get("currentPage"));
         assertEquals(5, ((List<?>) model.get("items")).size());
-        assertEquals("/questions?page=1", model.get("returnUrl"));
+        assertEquals("/questions?page=1&_return=1", model.get("returnUrl"));
     }
 
     @Test
@@ -124,7 +124,30 @@ class QuestionWebWorkflowIntegrationTest {
         assertEquals(2, model.get("currentPage"));
         assertEquals(2, model.get("totalPages"));
         assertEquals(2, ((List<?>) model.get("items")).size());
-        assertEquals("/questions?sortBy=id&direction=asc&page=2", model.get("returnUrl"));
+        assertEquals("/questions?sortBy=id&direction=asc&page=2&_return=1", model.get("returnUrl"));
+    }
+
+    @Test
+    void returnFromEditKeepsRequestedPageEvenWhenFilteredResultsHaveShrunk() throws Exception {
+        MvcResult result = mvc.perform(get("/questions")
+                        .param("year", "2022")
+                        .param("subject", "Databases")
+                        .param("topic", "SQL")
+                        .param("tag_REPEATED", "include")
+                        .param("page", "3")
+                        .param("_return", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("list"))
+                .andReturn();
+
+        var model = result.getModelAndView().getModel();
+        assertEquals(3, model.get("currentPage"));
+        assertEquals(1, model.get("totalPages"));
+        assertEquals(0, ((List<?>) model.get("items")).size());
+        assertEquals("/questions?year=2022&subject=Databases&topic=SQL&tag_REPEATED=include&page=3&_return=1",
+                model.get("returnUrl"));
+        assertFalse(((String) model.get("previousPageUrl")).contains("_return"));
+        assertFalse(((String) model.get("nextPageUrl")).contains("_return"));
     }
 
     @Test
