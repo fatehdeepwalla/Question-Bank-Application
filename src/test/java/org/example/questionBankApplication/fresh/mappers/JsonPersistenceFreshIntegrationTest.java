@@ -95,7 +95,7 @@ class JsonPersistenceFreshIntegrationTest {
 
         List<Question> questions = JSON_Reader.readQuestions(directory);
         assertEquals(1, questions.size());
-        assertEquals(1, questions.getFirst().getId());
+        assertEquals(1, questions.get(0).getId());
     }
 
     @Test
