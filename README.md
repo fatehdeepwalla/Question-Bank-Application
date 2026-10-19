@@ -1,4 +1,4 @@
-# Question Bank Application
+# 📚 Question Bank Application
 - I built this application to support my preparation for the **GATE Computer Science Examination**.
 - It brings previous-year questions together in single, organized collection.
 - Tag questions as **Solved**, **Repeated**, **Important**, or **Very Important**.
@@ -13,7 +13,7 @@
 ![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)
 
 ---
-## Why I Built It
+## 💡 Why I Built It
 
 - Several online platforms already offer GATE previous-year question banks, allowing users to filter questions by subject and topic (a subtopic within a subject).
 - One such site is [practicepaper.in](https://practicepaper.in/).  
@@ -27,7 +27,7 @@
 
 
 ---
-## Features
+## ✨ Features
 
 - **Organized question library:** Displays questions using their associated images, with metadata for year, subject, topic, question type, answer, and tags.
 - **Flexible filtering:** Narrow the collection by GATE year, subject, topic, and tag. Tag filters support including or excluding questions with a particular tag.
@@ -39,7 +39,7 @@
 - **Persistent local storage:** Question metadata is stored in individual JSON files. Changes made through the editor are saved to the corresponding file, so they remain available after restarting the application.
 
 ---
-## Tech Stack
+## 🛠️ Tech Stack
 
   | Technology | Role |
   | --- | --- |
@@ -51,7 +51,7 @@
   | Maven Wrapper | Builds and runs the application using Maven commands |
 
 ---
-## How It Works
+## ⚙️ How It Works
 
 1. Each question has a JSON metadata file, named `question-<id>.json` in `JSON_Files/`.
 2. The associated question image is stored in `Question_Images/`.
@@ -61,7 +61,7 @@
 6. The project uses **file-based storage**, so a separate database setup is not required.
 
 ---
-## Getting Started
+## 🚀 Getting Started
 
 **Prerequisites**
 - JDK 17 or later
@@ -90,7 +90,7 @@
 - Once startup is complete, open [http://localhost:8080/questions](http://localhost:8080/questions) in your browser.
 
 ---
-## Project Structure
+## 🗂️ Project Structure
 
 ```text
 Question-Bank-Application/
@@ -114,7 +114,7 @@ Question-Bank-Application/
 ```
 
 ---
-## Question Data
+## 🧾 Question Data
 - Each question is represented by a JSON metadata file containing its ID, image path, year, subject, topic, question type, answer, and tags.
   
 - **Subject and Topic Relationship** : Each topic is associated with a subject. For example, `Relation` is a topic under `Discrete_Mathematics`. The subject and topic must correspond to the application's subject-topic mapping.
@@ -151,6 +151,6 @@ Question-Bank-Application/
 
 
 ---
-## Future Scope
+## 🔮 Future Scope
 
 Potential extensions include user accounts, cloud/database-backed storage, and richer revision or practice modes. The current version focuses on keeping the local GATE CSE question collection organized and editable.
