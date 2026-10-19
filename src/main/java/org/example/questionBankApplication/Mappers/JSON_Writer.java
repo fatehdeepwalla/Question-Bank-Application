@@ -23,7 +23,9 @@ public final class JSON_Writer {
         if (questions == null) {throw new IllegalArgumentException("Questions list cannot be null");}
         if (outputDirectory == null) {throw new IllegalArgumentException("Output directory cannot be null");}
         // Check if directory is there or not
-        if (!Files.isDirectory(outputDirectory)) {throw new IOException("Output directory does not exist or is not a directory: " + outputDirectory);}
+        if (!Files.isDirectory(outputDirectory)) {
+            throw new IOException("Output directory does not exist or is not a directory: " + outputDirectory);
+        }
 
         // Check for duplicate IDs before writing any files.
         Set<Integer> ids = new HashSet<>();
@@ -49,34 +51,31 @@ public final class JSON_Writer {
      * unsuccessful serialization will not truncate the existing question file.
      */
     public static void writeQuestion(Question question, Path outputDirectory) throws IOException {
-        if (question == null) {
-            throw new IllegalArgumentException("Question cannot be null");
-        }
-        if (outputDirectory == null) {
-            throw new IllegalArgumentException("Output directory cannot be null");
+        if (question == null) {throw new IllegalArgumentException("Question cannot be null");}
+        if (outputDirectory == null) {throw new IllegalArgumentException("Output directory cannot be null");}
+
+        if (!Files.isDirectory(outputDirectory)) {
+            throw new IOException("Output directory does not exist or is not a directory: " + outputDirectory);
         }
 
-        Path directory = outputDirectory.toAbsolutePath().normalize();
-        if (!Files.isDirectory(directory)) {
-            throw new IOException("Output directory does not exist or is not a directory: " + directory);
-        }
+        // Creating the path for question file
+        Path target = outputDirectory.resolve("question-" + question.getId() + ".json");
 
-        Path target = directory.resolve("question-" + question.getId() + ".json").normalize();
-        if (!directory.equals(target.getParent())) {
-            throw new IOException("The question file path is not inside the JSON directory.");
-        }
+        // We cannot edit a question which does not exist
         if (!Files.isRegularFile(target)) {
             throw new IOException("The existing question file was not found: " + target.getFileName());
         }
 
-        Path temporaryFile = Files.createTempFile(directory,
+        // question object is written to temporary JSON File
+        Path temporaryFile = Files.createTempFile(outputDirectory,
                 ".question-" + question.getId() + "-", ".tmp");
+
+        // Original files is replaced by this temporary file and temporary file is deleted
+        // Note these operations are atomic
         try {
             OBJECT_MAPPER.writeValue(temporaryFile.toFile(), question);
             try {
-                Files.move(temporaryFile, target,
-                        StandardCopyOption.ATOMIC_MOVE,
-                        StandardCopyOption.REPLACE_EXISTING);
+                Files.move(temporaryFile, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException exception) {
                 Files.move(temporaryFile, target, StandardCopyOption.REPLACE_EXISTING);
             }

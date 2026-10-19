@@ -2,7 +2,6 @@ package org.example.questionBankApplication.model;
 
 import org.example.questionBankApplication.model.answer.AnswerOption;
 import org.example.questionBankApplication.model.answer.MCQ_Answer;
-import org.example.questionBankApplication.model.answer.MSQ_Answer;
 import org.example.questionBankApplication.model.answer.NAT_Answer;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
@@ -31,7 +30,7 @@ class QuestionAnswerValidationTest {
                 Type.MCQ, null, Set.of());
         question.setMcqAnswer(AnswerOption.A);
 
-        question.setType(Type.NAT);
+        question.setTypeAndAnswer(Type.NAT);
 
         assertNull(question.getAnswer());
         assertEquals(Type.NAT, question.getType());
