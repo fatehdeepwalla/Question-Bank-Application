@@ -6,7 +6,7 @@
   "topic" : "Regular_Language",
   "type" : "MSQ",
   "answer" : {
-    "correctOptions" : [ "A", "C", "D" ]
+    "correctOptions" : [ "A", "C" ]
   },
   "questionTags" : [ ]
 }
