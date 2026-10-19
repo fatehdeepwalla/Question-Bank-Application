@@ -54,9 +54,13 @@ public class ListController {
         int totalPages = totalFilteredCount / PAGE_SIZE + (totalFilteredCount % PAGE_SIZE == 0 ? 0 : 1);
         int requestedPage = parseRequestedPage(parameters.get("page"));
 
-        // There are no pages when the filtered collection is empty. Otherwise, clamp
-        // out-of-range page requests to the last available page.
-        int currentPage = totalPages == 0 ? 1 : Math.min(requestedPage, totalPages);
+        // A return from the edit screen carries _return=1. Keep the requested page
+        // even if the edited question changes the result count; silently clamping
+        // it would return the user to a different page.
+        boolean returningFromEdit = "1".equals(parameters.get("_return"));
+        int currentPage = returningFromEdit
+                ? requestedPage
+                : (totalPages == 0 ? 1 : Math.min(requestedPage, totalPages));
         int fromIndex = Math.min((currentPage - 1) * PAGE_SIZE, totalFilteredCount);
         int toIndex = Math.min(fromIndex + PAGE_SIZE, totalFilteredCount);
         List<QuestionDTO> pageItems = filteredItems.subList(fromIndex, toIndex);
@@ -74,7 +78,7 @@ public class ListController {
         model.addAttribute("hasNextPage", currentPage < totalPages);
         model.addAttribute("previousPageUrl", buildPageUrl(parameters, currentPage - 1));
         model.addAttribute("nextPageUrl", buildPageUrl(parameters, currentPage + 1));
-        model.addAttribute("returnUrl", buildPageUrl(parameters, currentPage));
+        model.addAttribute("returnUrl", buildReturnUrl(parameters, currentPage));
 
         // Preserve selected criteria in the filter form.
         model.addAttribute("selectedYear", filter.getYear());
@@ -116,12 +120,30 @@ public class ListController {
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/questions");
 
         parameters.forEach((name, value) -> {
-            if (!"page".equals(name) && value != null) {
+            if (!"page".equals(name) && !"_return".equals(name) && value != null) {
                 builder.queryParam(name, value);
             }
         });
 
         return builder.queryParam("page", Math.max(1, page))
+                .build()
+                .encode()
+                .toUriString();
+    }
+
+    /**
+     * Builds a return link distinct from ordinary pagination links. The marker
+     * lets the list retain the requested page if saving changes the match count.
+     */
+    private String buildReturnUrl(Map<String, String> parameters, int page) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/questions");
+        parameters.forEach((name, value) -> {
+            if (!"page".equals(name) && !"_return".equals(name) && value != null) {
+                builder.queryParam(name, value);
+            }
+        });
+        return builder.queryParam("page", Math.max(1, page))
+                .queryParam("_return", "1")
                 .build()
                 .encode()
                 .toUriString();
