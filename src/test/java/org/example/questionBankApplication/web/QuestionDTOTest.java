@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ViewDTOTest {
+class QuestionDTOTest {
 
     @Test
     void formatsQuestionIdAndNormalizesWindowsImagePaths() {
@@ -21,7 +21,7 @@ class ViewDTOTest {
                 2021, Topic.Graph_Theory, Type.MCQ, null, Set.of());
         question.setMcqAnswer(AnswerOption.B);
 
-        ViewDTO view = new ViewDTO(question);
+        QuestionDTO view = new QuestionDTO(question);
 
         assertEquals("QB-0012", view.getIdLabel());
         assertEquals("/question-images/Screenshot%202026-10-14%20202530.png",
@@ -34,7 +34,7 @@ class ViewDTOTest {
                 Topic.Graph_Theory, Type.MCQ, null, Set.of(Tag.SOLVED));
         question.setMcqAnswer(AnswerOption.C);
 
-        ViewDTO view = new ViewDTO(question);
+        QuestionDTO view = new QuestionDTO(question);
 
         assertEquals("2021", view.getYearLabel());
         assertEquals("Discrete_Mathematics", view.getSubjectLabel());
@@ -56,8 +56,8 @@ class ViewDTOTest {
                 Topic.SQL, Type.NAT, null, Set.of());
         nat.setNatAnswer(2.5, 3.5);
 
-        assertEquals("B, D", new ViewDTO(msq).getAnswerLabel());
-        assertEquals("2.5 – 3.5", new ViewDTO(nat).getAnswerLabel());
+        assertEquals("B, D", new QuestionDTO(msq).getAnswerLabel());
+        assertEquals("2.5 – 3.5", new QuestionDTO(nat).getAnswerLabel());
     }
 
     @Test
@@ -68,7 +68,7 @@ class ViewDTOTest {
 
         Question question = new Question(4, " ", 0,
                 null, null, null, tagsWithNull);
-        ViewDTO view = new ViewDTO(question);
+        QuestionDTO view = new QuestionDTO(question);
 
         assertEquals("Year not set", view.getYearLabel());
         assertEquals("Subject not assigned", view.getSubjectLabel());
@@ -87,6 +87,6 @@ class ViewDTOTest {
                 2020, Topic.Graph_Theory, Type.MCQ, null, Set.of());
 
         assertEquals("/question-images/question%20%235%20(A).png",
-                new ViewDTO(question).getImageUrl());
+                new QuestionDTO(question).getImageUrl());
     }
 }

@@ -1,10 +1,10 @@
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.editControler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** Form backing bean for editing the editable metadata of an existing question. */
-public class QuestionEditForm {
+public class EditForm {
 
     private String year = "";
     private String subject = "";

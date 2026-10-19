@@ -1,7 +1,7 @@
 
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.listController;
 
-import org.example.questionBankApplication.web.ViewDTO;
+import org.example.questionBankApplication.web.QuestionDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class QuestionStatisticsService {
+public class StatisticsService {
 
-    public Map<String, Object> calculate(List<ViewDTO> items) {
+    public Map<String, Object> calculate(List<QuestionDTO> items) {
 
         Map<String, Object> stats = new LinkedHashMap<>();
 
         long totalFilteredCount = items.size();
-        long classified = items.stream().filter(ViewDTO::isClassified).count();
+        long classified = items.stream().filter(QuestionDTO::isClassified).count();
         long tagged = items.stream().filter(item -> !item.getTagLabels().isEmpty()).count();
-        long yearAssigned = items.stream().filter(ViewDTO::isYearAssigned).count();
-        long subjectAssigned = items.stream().filter(ViewDTO::isSubjectAssigned).count();
-        long topicAssigned = items.stream().filter(ViewDTO::isTopicAssigned).count();
-        long typeAssigned = items.stream().filter(ViewDTO::isTypeAssigned).count();
-        long answerAssigned = items.stream().filter(ViewDTO::isAnswerAssigned).count();
+        long yearAssigned = items.stream().filter(QuestionDTO::isYearAssigned).count();
+        long subjectAssigned = items.stream().filter(QuestionDTO::isSubjectAssigned).count();
+        long topicAssigned = items.stream().filter(QuestionDTO::isTopicAssigned).count();
+        long typeAssigned = items.stream().filter(QuestionDTO::isTypeAssigned).count();
+        long answerAssigned = items.stream().filter(QuestionDTO::isAnswerAssigned).count();
 
         stats.put("totalFilteredCount", totalFilteredCount);
         stats.put("classifiedQuestions", classified);
@@ -49,7 +49,7 @@ public class QuestionStatisticsService {
         return stats;
     }
 
-    private long countTag(List<ViewDTO> items, String tagName) {
+    private long countTag(List<QuestionDTO> items, String tagName) {
         return items.stream().filter(item -> item.getTagLabels().contains(tagName)).count();
     }
 }

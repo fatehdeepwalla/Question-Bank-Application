@@ -1,4 +1,4 @@
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.listController;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
@@ -6,7 +6,7 @@ import org.example.questionBankApplication.model.subject_topic.Subject;
 import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionService;
-import org.example.questionBankApplication.web.ViewDTO;
+import org.example.questionBankApplication.web.QuestionDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,41 +18,40 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class QuestionController {
+public class ListController {
 
     private static final int PAGE_SIZE = 5;
 
     private final QuestionService questionService;
-    private final QuestionQueryService questionQueryService;
-    private final QuestionStatisticsService statisticsService;
+    private final Query query;
+    private final StatisticsService statisticsService;
 
-    public QuestionController(
+    public ListController(
             QuestionService questionService,
-            QuestionQueryService questionQueryService,
-            QuestionStatisticsService statisticsService) {
+            Query query,
+            StatisticsService statisticsService) {
         this.questionService = questionService;
-        this.questionQueryService = questionQueryService;
+        this.query = query;
         this.statisticsService = statisticsService;
     }
 
     @GetMapping({"/", "/questions"})
     public String showQuestions(@RequestParam Map<String, String> parameters, Model model) {
 
-        QuestionFilter filter = QuestionFilter.fromParameters(parameters);
+        Filter filter = Filter.fromParameters(parameters);
 
         // Retrieve the existing JSON-backed collection.
         List<Question> allQuestions = questionService.findAll();
 
         // Apply the submitted filters and sorting before dividing results into pages.
-        List<Question> filteredQuestions = questionQueryService.filterAndSort(allQuestions, filter);
-        List<ViewDTO> filteredItems = filteredQuestions.stream().map(ViewDTO::new).toList();
+        List<Question> filteredQuestions = query.filterAndSort(allQuestions, filter);
+        List<QuestionDTO> filteredItems = filteredQuestions.stream().map(QuestionDTO::new).toList();
 
         // Statistics always describe the full filtered collection, not just the current page.
         model.addAllAttributes(statisticsService.calculate(filteredItems));
 
         int totalFilteredCount = filteredItems.size();
-        int totalPages = totalFilteredCount / PAGE_SIZE
-                + (totalFilteredCount % PAGE_SIZE == 0 ? 0 : 1);
+        int totalPages = totalFilteredCount / PAGE_SIZE + (totalFilteredCount % PAGE_SIZE == 0 ? 0 : 1);
         int requestedPage = parseRequestedPage(parameters.get("page"));
 
         // There are no pages when the filtered collection is empty. Otherwise, clamp
@@ -60,10 +59,12 @@ public class QuestionController {
         int currentPage = totalPages == 0 ? 1 : Math.min(requestedPage, totalPages);
         int fromIndex = Math.min((currentPage - 1) * PAGE_SIZE, totalFilteredCount);
         int toIndex = Math.min(fromIndex + PAGE_SIZE, totalFilteredCount);
-        List<ViewDTO> pageItems = filteredItems.subList(fromIndex, toIndex);
+        List<QuestionDTO> pageItems = filteredItems.subList(fromIndex, toIndex);
 
         model.addAttribute("items", pageItems);
         model.addAttribute("totalCount", allQuestions.size());
+
+        // Pagination
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("pageSize", PAGE_SIZE);
         model.addAttribute("totalPages", totalPages);
@@ -75,19 +76,18 @@ public class QuestionController {
         model.addAttribute("nextPageUrl", buildPageUrl(parameters, currentPage + 1));
 
         // Preserve selected criteria in the filter form.
-        model.addAttribute("selectedYear", filter.getSelectedYear());
+        model.addAttribute("selectedYear", filter.getYear());
         model.addAttribute("selectedSubject", filter.getSelectedSubject());
         model.addAttribute("selectedTopic", filter.getSelectedTopic());
+        model.addAttribute("tagStates", filter.getTagStatesForView());
         model.addAttribute("sortBy", filter.getSortBy());
         model.addAttribute("direction", filter.getDirection());
-        model.addAttribute("tagStates", filter.getTagStatesForView());
-        model.addAttribute("filterErrors", filter.getValidationErrors());
+        model.addAttribute("filterErrors", filter.getValidationErrorsForView());
 
         // Subject and tag dropdown options.
         model.addAttribute("tagOptions", Tag.values());
         model.addAttribute("subjectOptions", SubjectTopicMap.getAllSubjects());
         model.addAttribute("topicOptions", SubjectTopicMap.getAllTopics());
-
         Map<String, List<String>> subjectTopicOptions = new LinkedHashMap<>();
         for (Subject subject : SubjectTopicMap.getAllSubjects()) {
             List<String> topics = SubjectTopicMap.getTopics(subject).stream().map(Topic::name).toList();
@@ -101,7 +101,7 @@ public class QuestionController {
     private int parseRequestedPage(String rawPage) {
         try {
             int page = Integer.parseInt(rawPage);
-            return page >= 1 ? page : 1;
+            return Math.max(page, 1);
         } catch (NumberFormatException exception) {
             return 1;
         }

@@ -1,7 +1,11 @@
 <section th:fragment="Question_Items">
     <section class="library-section">
+
+        <!-- Question Card -->
         <div class="question-list" th:if="${!items.isEmpty()}">
             <article class="question-card" th:each="item : ${items}">
+
+                <!-- Left Half -->
                 <div class="question-preview">
                     <div class="preview-toolbar">
                         <span class="preview-label"><span class="preview-label-dot"></span> SOURCE IMAGE</span>
@@ -130,6 +134,7 @@
             <p class="source-image-viewer-help">Source image · Press Esc or click outside to close</p>
         </div>
 
+        <!-- This script is for creating full size screen for image -->
         <script>
             (function () {
                 const viewer = document.getElementById("source-image-viewer");
@@ -210,6 +215,7 @@
             })();
         </script>
 
+        <!-- Empty state: If there is nothing to load -->
         <div class="empty-state" th:if="${items.isEmpty()}">
             <div class="empty-state-icon"><svg viewBox="0 0 24 24"><path d="M5 4.75A2.75 2.75 0 0 1 7.75 2H20v17H7.75A2.75 2.75 0 0 0 5 21.75z"/><path d="M5 4.75v17M8.5 6H16M8.5 9.5H16"/></svg></div>
             <h3>Your library is waiting for its first question</h3>

@@ -1,11 +1,11 @@
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.listController;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.AnswerOption;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
-import org.example.questionBankApplication.web.ViewDTO;
+import org.example.questionBankApplication.web.QuestionDTO;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,23 +14,23 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class QuestionStatisticsServiceTest {
+class StatisticsServiceTest {
 
-    private final QuestionStatisticsService service = new QuestionStatisticsService();
+    private final StatisticsService service = new StatisticsService();
 
-    private ViewDTO classified(int id, Set<Tag> tags) {
+    private QuestionDTO classified(int id, Set<Tag> tags) {
         Question question = new Question(id, "q" + id + ".png", 2021,
                 Topic.Graph_Theory, Type.MCQ, null, tags);
         question.setMcqAnswer(AnswerOption.A);
-        return new ViewDTO(question);
+        return new QuestionDTO(question);
     }
 
     @Test
     void calculatesCountsForClassificationAndRevisionTags() {
-        List<ViewDTO> items = List.of(
+        List<QuestionDTO> items = List.of(
                 classified(1, Set.of(Tag.SOLVED, Tag.IMPORTANT)),
                 classified(2, Set.of(Tag.REPEATED)),
-                new ViewDTO(new Question(3, "q3.png", 0, null, null, null, Set.of()))
+                new QuestionDTO(new Question(3, "q3.png", 0, null, null, null, Set.of()))
         );
 
         Map<String, Object> stats = service.calculate(items);

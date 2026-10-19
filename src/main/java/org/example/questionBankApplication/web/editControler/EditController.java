@@ -1,4 +1,4 @@
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.editControler;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
@@ -12,7 +12,7 @@ import org.example.questionBankApplication.model.subject_topic.Subject;
 import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionService;
-import org.example.questionBankApplication.web.ViewDTO;
+import org.example.questionBankApplication.web.QuestionDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,14 +33,14 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
-public class QuestionEditController {
+public class EditController {
 
     private static final int UNASSIGNED_YEAR = -9999;
     private static final int MAX_TAGS = 3;
 
     private final QuestionService questionService;
 
-    public QuestionEditController(QuestionService questionService) {
+    public EditController(QuestionService questionService) {
         this.questionService = questionService;
     }
 
@@ -55,14 +55,14 @@ public class QuestionEditController {
         }
 
         Question question = found.get();
-        QuestionEditForm form = toForm(question);
+        EditForm form = toForm(question);
         addEditPageAttributes(model, question, form, List.of());
         return "edit-question";
     }
 
     @PostMapping("/questions/{id}/edit")
     public String saveEdit(@PathVariable int id,
-                           @ModelAttribute("form") QuestionEditForm form,
+                           @ModelAttribute("form") EditForm form,
                            Model model,
                            RedirectAttributes redirectAttributes) {
         Optional<Question> found = questionService.findById(id);
@@ -125,9 +125,9 @@ public class QuestionEditController {
 
     private void addEditPageAttributes(Model model,
                                        Question question,
-                                       QuestionEditForm form,
+                                       EditForm form,
                                        List<String> errors) {
-        ViewDTO view = new ViewDTO(question);
+        QuestionDTO view = new QuestionDTO(question);
         model.addAttribute("questionId", question.getId());
         model.addAttribute("questionIdLabel", view.getIdLabel());
         model.addAttribute("questionImageUrl", view.getImageUrl());
@@ -151,8 +151,8 @@ public class QuestionEditController {
         model.addAttribute("subjectTopicOptions", subjectTopicOptions);
     }
 
-    private QuestionEditForm toForm(Question question) {
-        QuestionEditForm form = new QuestionEditForm();
+    private EditForm toForm(Question question) {
+        EditForm form = new EditForm();
 
         int year = question.getYear();
         form.setYear(year >= 1990 && year <= 2030 ? Integer.toString(year) : "");
@@ -231,7 +231,7 @@ public class QuestionEditController {
         return tags;
     }
 
-    private Answer parseAnswer(QuestionEditForm form, Type type, List<String> errors) {
+    private Answer parseAnswer(EditForm form, Type type, List<String> errors) {
         if (type == null) {
             return null;
         }
