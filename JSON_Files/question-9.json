@@ -1,10 +1,12 @@
 {
   "id" : 9,
   "imagePath" : "Question_Images\\Screenshot 2026-10-14 202635.png",
-  "year" : -9999,
-  "subject" : null,
-  "topic" : null,
-  "type" : null,
-  "answer" : null,
-  "questionTags" : null
+  "year" : 2020,
+  "subject" : "Algorithms",
+  "topic" : "Minimum_Spanning_Tree",
+  "type" : "MSQ",
+  "answer" : {
+    "correctOptions" : [ "C", "D" ]
+  },
+  "questionTags" : [ "SOLVED" ]
 }
