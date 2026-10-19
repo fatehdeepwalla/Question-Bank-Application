@@ -74,6 +74,7 @@ public class ListController {
         model.addAttribute("hasNextPage", currentPage < totalPages);
         model.addAttribute("previousPageUrl", buildPageUrl(parameters, currentPage - 1));
         model.addAttribute("nextPageUrl", buildPageUrl(parameters, currentPage + 1));
+        model.addAttribute("returnUrl", buildPageUrl(parameters, currentPage));
 
         // Preserve selected criteria in the filter form.
         model.addAttribute("selectedYear", filter.getYear());
