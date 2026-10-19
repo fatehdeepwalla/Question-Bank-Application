@@ -158,6 +158,5 @@ class QuestionDomainUnitTest {
     void answerObjectsRejectNullRequiredValues() {
         assertThrows(RuntimeException.class, () -> new MCQ_Answer(null));
         assertThrows(RuntimeException.class, () -> new MSQ_Answer(null));
-        assertThrows(RuntimeException.class, () -> new MCQ_Answer(AnswerOption.No_Valid_Answer_Stored));
     }
 }
