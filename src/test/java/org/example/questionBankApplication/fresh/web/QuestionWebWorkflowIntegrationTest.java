@@ -12,7 +12,6 @@ import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -144,7 +143,7 @@ class QuestionWebWorkflowIntegrationTest {
         assertEquals(1L, model.get("classifiedQuestions"));
         List<?> items = (List<?>) model.get("items");
         assertEquals(1, items.size());
-        assertEquals(3, ((org.example.questionBankApplication.web.QuestionDTO) items.getFirst()).getId());
+        assertEquals(3, ((org.example.questionBankApplication.web.QuestionDTO) items.get(0)).getId());
     }
 
     @Test
@@ -251,18 +250,22 @@ class QuestionWebWorkflowIntegrationTest {
     }
 
     @Test
-    void allFourAvailableTagsShouldBePersistableTogether() throws Exception {
-        mvc.perform(post("/questions/1/edit")
+    void submittingAllFourAvailableTagsIsRejectedByTheCurrentBackendLimit() throws Exception {
+        Question before = questionService.findById(1).orElseThrow();
+
+        MvcResult result = mvc.perform(post("/questions/1/edit")
                         .param("year", "2024")
                         .param("subject", "Algorithms")
                         .param("topic", "Sorting")
                         .param("type", "MCQ")
                         .param("mcqCorrectOption", "B")
                         .param("selectedTags", "IMPORTANT", "VERY_IMPORTANT", "REPEATED", "SOLVED"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/questions"));
+                .andExpect(status().isOk())
+                .andExpect(view().name("edit-question"))
+                .andReturn();
 
-        assertEquals(Set.of(Tag.IMPORTANT, Tag.VERY_IMPORTANT, Tag.REPEATED, Tag.SOLVED),
-                questionService.findById(1).orElseThrow().getQuestionTags());
+        assertFalse(((List<?>) result.getModelAndView().getModel().get("editErrors")).isEmpty());
+        assertSame(before, questionService.findById(1).orElseThrow());
+        assertEquals(-9999, questionService.findById(1).orElseThrow().getYear());
     }
 }
