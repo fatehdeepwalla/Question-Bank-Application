@@ -30,7 +30,7 @@ class StatisticsServiceTest {
         List<QuestionDTO> items = List.of(
                 classified(1, Set.of(Tag.SOLVED, Tag.IMPORTANT)),
                 classified(2, Set.of(Tag.REPEATED)),
-                new QuestionDTO(new Question(3, "q3.png", 0, null, null, null, Set.of()))
+                new QuestionDTO(new Question(3, "q3.png"))
         );
 
         Map<String, Object> stats = service.calculate(items);
