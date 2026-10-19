@@ -2,8 +2,8 @@
   "id" : 2,
   "imagePath" : "Question_Images\\Screenshot 2026-10-14 202539.png",
   "year" : 2020,
-  "subject" : "Computer_Networks",
-  "topic" : "Physical_Layer",
+  "subject" : "Compiler_Design",
+  "topic" : "Syntax_Directed_Translation",
   "type" : "MCQ",
   "answer" : {
     "correctOption" : "C"

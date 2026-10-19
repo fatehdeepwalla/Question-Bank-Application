@@ -1,10 +1,12 @@
 {
   "id" : 14,
   "imagePath" : "Question_Images\\Screenshot 2026-10-14 202722.png",
-  "year" : -9999,
-  "subject" : null,
-  "topic" : null,
-  "type" : null,
-  "answer" : null,
-  "questionTags" : null
+  "year" : 2023,
+  "subject" : "Databases",
+  "topic" : "Normal_Form",
+  "type" : "MCQ",
+  "answer" : {
+    "correctOption" : "D"
+  },
+  "questionTags" : [ "IMPORTANT" ]
 }
