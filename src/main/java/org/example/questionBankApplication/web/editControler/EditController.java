@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -45,25 +47,36 @@ public class EditController {
     }
 
     @GetMapping("/questions/{id}/edit")
-    public String showEditPage(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditPage(
+            @PathVariable int id,
+            @RequestParam(name = "returnUrl", defaultValue = "/questions") String returnUrl,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        String safeReturnUrl = safeReturnUrl(returnUrl);
         Optional<Question> found = questionService.findById(id);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Question " + id + " was not found.");
-            return "redirect:/questions";
+            return "redirect:" + safeReturnUrl;
         }
 
         Question question = found.get();
         EditForm form = toForm(question);
-        addEditPageAttributes(model, question, form, List.of());
+        addEditPageAttributes(model, question, form, List.of(), safeReturnUrl);
         return "edit-question";
     }
 
     @PostMapping("/questions/{id}/edit")
-    public String saveEdit(@PathVariable int id, @ModelAttribute("form") EditForm form, Model model, RedirectAttributes redirectAttributes) {
+    public String saveEdit(
+            @PathVariable int id,
+            @RequestParam(name = "returnUrl", defaultValue = "/questions") String returnUrl,
+            @ModelAttribute("form") EditForm form,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        String safeReturnUrl = safeReturnUrl(returnUrl);
         Optional<Question> found = questionService.findById(id);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Question " + id + " was not found.");
-            return "redirect:/questions";
+            return "redirect:" + safeReturnUrl;
         }
 
         Question original = found.get();
@@ -103,7 +116,7 @@ public class EditController {
         }
 
         if (!errors.isEmpty()) {
-            addEditPageAttributes(model, original, form, errors);
+            addEditPageAttributes(model, original, form, errors, safeReturnUrl);
             return "edit-question";
         }
 
@@ -116,7 +129,7 @@ public class EditController {
             errors.add(exception.getMessage() == null
                     ? "The submitted question details are not valid."
                     : exception.getMessage());
-            addEditPageAttributes(model, original, form, errors);
+            addEditPageAttributes(model, original, form, errors, safeReturnUrl);
             return "edit-question";
         }
 
@@ -125,19 +138,25 @@ public class EditController {
         } catch (IOException | IllegalArgumentException exception) {
             errors.add("The question could not be saved. The original JSON record has been kept. "
                     + safeMessage(exception));
-            addEditPageAttributes(model, original, form, errors);
+            addEditPageAttributes(model, original, form, errors, safeReturnUrl);
             return "edit-question";
         }
 
         redirectAttributes.addFlashAttribute("successMessage", "Question " + id + " was updated successfully.");
-        return "redirect:/questions";
+        return "redirect:" + safeReturnUrl;
     }
 
-    private void addEditPageAttributes(Model model, Question question, EditForm form, List<String> errors) {
+    private void addEditPageAttributes(
+            Model model,
+            Question question,
+            EditForm form,
+            List<String> errors,
+            String returnUrl) {
         QuestionDTO view = new QuestionDTO(question);
         model.addAttribute("questionId", question.getId());
         model.addAttribute("questionIdLabel", view.getIdLabel());
         model.addAttribute("questionImageUrl", view.getImageUrl());
+        model.addAttribute("returnUrl", returnUrl);
         model.addAttribute("form", form);
         model.addAttribute("editErrors", errors);
         model.addAttribute("subjectOptions", Subject.values());
@@ -294,6 +313,29 @@ public class EditController {
             }
         }
         return null;
+    }
+
+    /**
+     * Accept only local return URLs for the question list, including its filter query string.
+     * Invalid or external URLs safely fall back to the unfiltered question list.
+     */
+    private String safeReturnUrl(String candidate) {
+        if (candidate == null || candidate.isBlank()) {
+            return "/questions";
+        }
+        try {
+            URI uri = URI.create(candidate);
+            if (uri.isAbsolute()
+                    || uri.getAuthority() != null
+                    || uri.getHost() != null
+                    || !"/questions".equals(uri.getPath())
+                    || uri.getFragment() != null) {
+                return "/questions";
+            }
+            return uri.toASCIIString();
+        } catch (IllegalArgumentException exception) {
+            return "/questions";
+        }
     }
 
     private String safeMessage(Exception exception) {
