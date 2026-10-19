@@ -33,5 +33,58 @@
 
     </main>
 </div>
+
+    <script>
+        (function () {
+            const storageKey = "questionBank.listReturnState";
+
+            function normalizedListUrl() {
+                const url = new URL(window.location.href);
+                url.searchParams.delete("_return");
+                return url.pathname + url.search + url.hash;
+            }
+
+            // Save the exact viewport position before navigating to Edit.
+            document.addEventListener("click", function (event) {
+                const editLink = event.target.closest("a.edit-question-button");
+                if (!editLink) return;
+
+                try {
+                    sessionStorage.setItem(storageKey, JSON.stringify({
+                        url: normalizedListUrl(),
+                        scrollX: window.scrollX,
+                        scrollY: window.scrollY
+                    }));
+                } catch (ignored) {
+                    // Navigation and return links still work if storage is unavailable.
+                }
+            });
+
+            // The return marker is used only to preserve the requested page when
+            // edits change the result count. Remove it from the visible URL.
+            const currentUrl = new URL(window.location.href);
+            if (currentUrl.searchParams.has("_return")) {
+                currentUrl.searchParams.delete("_return");
+                window.history.replaceState(window.history.state, "", currentUrl.pathname + currentUrl.search + currentUrl.hash);
+            }
+
+            // Restore once, only when the user has returned to the same list URL.
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(storageKey) || "null");
+                if (saved && saved.url === normalizedListUrl()) {
+                    sessionStorage.removeItem(storageKey);
+                    window.addEventListener("pageshow", function () {
+                        requestAnimationFrame(function () {
+                            window.scrollTo(saved.scrollX || 0, saved.scrollY || 0);
+                        });
+                    }, { once: true });
+                }
+            } catch (ignored) {
+                // A malformed or unavailable state must never block the list.
+                try { sessionStorage.removeItem(storageKey); } catch (ignoredAgain) {}
+            }
+        })();
+    </script>
+
 </body>
 </html>
