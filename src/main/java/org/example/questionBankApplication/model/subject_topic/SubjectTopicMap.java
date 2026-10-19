@@ -8,41 +8,34 @@ public final class SubjectTopicMap {
     // This class cannot be instantiated
     private SubjectTopicMap(){};
 
+
+    // All of these methods throws exception if argument is not valid
     public static Set<Topic> getTopics(Subject subject) {
         if (subject == null) {
             throw new IllegalStateException("Supplied Argument to method is null");
         }
         return map.get(subject);
     }
-
     public static Subject getSubject(Topic topic) {
-
         if (topic == null) {
             throw new IllegalStateException("Supplied Argument to method is null");
         }
-
         for (Map.Entry<Subject, Set<Topic>> entry : map.entrySet()) {
             if (entry.getValue().contains(topic)) {
                 return entry.getKey();
             }
         }
-
         throw new IllegalStateException("Topic not found");
     }
-
     public static boolean isValidTopic(Subject subject, Topic topic) {
-
         if (subject == null || topic == null) {
             throw new IllegalStateException("Supplied Argument to method is null");
         }
-
         return map.get(subject).contains(topic);
     }
-
     public static Set<Subject> getAllSubjects() {
         return map.keySet();
     }
-
     public static Set<Topic> getAllTopics() {
         Set<Topic> topics = new java.util.HashSet<>();
 
@@ -54,9 +47,7 @@ public final class SubjectTopicMap {
     }
 
 
-
     private static final Map<Subject, Set<Topic>> map = createMap();
-
     private static Map<Subject, Set<Topic>> createMap() {
         return Map.ofEntries(
                 Map.entry(Subject.Discrete_Mathematics,
@@ -221,13 +212,7 @@ public final class SubjectTopicMap {
     // Validation of the Map
     static {
         // Validate the number of subjects
-        if (map.size() != 13) {
-            throw new IllegalStateException("Expected 13 subjects, but found " + map.size());
-        }
-
-        if (map.size() != Subject.values().length) {
-            throw new IllegalStateException("Mismatch between number of Subjects in enum and keys stored in Map");
-        }
+        checkSubjectCount();
 
         // Validate the number of topics under each subject
         checkTopicCount(Subject.Discrete_Mathematics, 11);
@@ -250,7 +235,14 @@ public final class SubjectTopicMap {
         // Validate if one topic is associated with one and only one subject.
         checkTopicMappings();
     }
-
+    private static void checkSubjectCount(){
+        if (map.size() != 13) {
+            throw new IllegalStateException("Expected 13 subjects, but found " + map.size());
+        }
+        if (map.size() != Subject.values().length) {
+            throw new IllegalStateException("Mismatch between number of Subjects in enum and keys stored in Map");
+        }
+    }
     private static void checkTopicCount(Subject subject, int expectedCount) {
         Set<Topic> topics = map.get(subject);
         if (topics == null || topics.size() != expectedCount) {
@@ -262,7 +254,6 @@ public final class SubjectTopicMap {
             );
         }
     }
-
     private static void checkTotalTopicCount() {
 
         int totalTopicsInMap = map.values()
@@ -276,7 +267,6 @@ public final class SubjectTopicMap {
             throw new IllegalStateException("Mismatch between number of Topics in enum and values stored in Map");
         }
     }
-
     private static void checkTopicMappings() {
 
         for (Topic topic : Topic.values()) {
@@ -298,5 +288,4 @@ public final class SubjectTopicMap {
             }
         }
     }
-
 }

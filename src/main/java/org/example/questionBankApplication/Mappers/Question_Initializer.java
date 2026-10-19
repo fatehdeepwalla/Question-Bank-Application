@@ -18,7 +18,9 @@ public final class Question_Initializer {
 
     public static List<Question> initializeFromDirectory(Path imageDirectory) throws IOException {
 
-        if (imageDirectory == null || !Files.isDirectory(imageDirectory)) {throw new IllegalArgumentException("Invalid image directory: " + imageDirectory);}
+        if (imageDirectory == null || !Files.isDirectory(imageDirectory)) {
+            throw new IllegalArgumentException("Invalid image directory: " + imageDirectory);
+        }
         List<Question> questions = new ArrayList<>();
         try (Stream<Path> paths = Files.list(imageDirectory)) {
             List<Path> imageFiles = paths.filter(Files::isRegularFile)
@@ -29,7 +31,7 @@ public final class Question_Initializer {
             int id = 1;
             for (Path imageFile : imageFiles) {
                 String imagePath = imageFile.toString();
-                Question question = new Question(id, imagePath, -9999, null, null, null, null);
+                Question question = new Question(id, imagePath);
                 questions.add(question);
                 id++;
             }

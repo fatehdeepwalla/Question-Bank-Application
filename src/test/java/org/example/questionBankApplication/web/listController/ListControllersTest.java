@@ -1,4 +1,4 @@
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.listController;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
@@ -6,6 +6,7 @@ import org.example.questionBankApplication.model.answer.AnswerOption;
 import org.example.questionBankApplication.model.answer.Type;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionService;
+import org.example.questionBankApplication.web.editControler.EditController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,7 +16,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class QuestionControllersTest {
+class ListControllersTest {
 
     private QuestionService service;
     private MockMvc mvc;
@@ -47,9 +47,9 @@ class QuestionControllersTest {
                 .filter(q -> q.getId() == (Integer) invocation.getArgument(0))
                 .findFirst());
 
-        QuestionController listController = new QuestionController(service,
-                new QuestionQueryService(), new QuestionStatisticsService());
-        QuestionEditController editController = new QuestionEditController(service);
+        ListController listController = new ListController(service,
+                new Query(), new StatisticsService());
+        EditController editController = new EditController(service);
         mvc = MockMvcBuilders.standaloneSetup(listController, editController).build();
     }
 

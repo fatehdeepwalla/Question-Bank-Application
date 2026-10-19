@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.answer.*;
+import org.example.questionBankApplication.model.subject_topic.Subject;
+import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 
 import java.io.IOException;
@@ -29,8 +31,9 @@ public final class JSON_Reader {
 
     public static List<Question> readQuestions(Path inputDirectory) throws IOException {
 
-        if (inputDirectory == null) {throw new IllegalArgumentException("Input directory cannot be null");}
-        if (!Files.isDirectory(inputDirectory)) {throw new IOException("Input directory does not exist or is not a directory: " + inputDirectory);}
+        if (inputDirectory == null || !Files.isDirectory(inputDirectory)) {
+            throw new IllegalArgumentException("Invalid image directory: " + inputDirectory);
+        }
 
         List<Path> jsonFiles;
         try (Stream<Path> paths = Files.list(inputDirectory)) {
@@ -63,8 +66,7 @@ public final class JSON_Reader {
         try {
             return deserializeQuestion(jsonFile);
         } catch (IOException exception) {
-            throw new IOException(
-                    "Failed to read question file " + jsonFile + ": " + exception.getMessage(), exception);
+            throw new IOException("Failed to read question file " + jsonFile + ": " + exception.getMessage(), exception);
         } catch (RuntimeException exception) {
             throw new IOException("Invalid question data in " + jsonFile + ": " + exception.getMessage(), exception);
         }
@@ -72,10 +74,53 @@ public final class JSON_Reader {
     private static Question deserializeQuestion(Path jsonFile) throws IOException {
 
         JsonNode root = OBJECT_MAPPER.readTree(jsonFile.toFile());
-        if (root == null || !root.isObject()) {throw new IOException("JSON must contain a question object");}
+        if (root == null || !root.isObject()) {throw new IOException("There is no JSON object in " + jsonFile);}
 
-        // Read {id, imagePath, year}
+        // Reading from JSON file
         int id = readInt(root, "id");
+        String imagePath = readImagePath(root);
+        int year = readInt(root, "year");
+        Topic topic = readTopic(root);
+        Subject subject = readSubject(root);
+        Type type = readType(root);
+        Answer answer = readAnswer(root, type);
+        Set<Tag> questionTags = readTags(root);
+
+        // Validation
+        checkFilenameMatchesID(jsonFile, id);
+        checkTopicMatchesSubject(topic, subject);
+        checkTypeMatchesAnswer(type, answer);
+
+
+        boolean notClassified=
+                year==-9999 &&
+                topic == null &&
+                subject ==null &&
+                type == null &&
+                answer == null &&
+                questionTags == null;
+        boolean classified=
+                !(year<1995 || year >2030) &&
+                topic != null &&
+                subject != null &&
+                type != null &&
+                answer!= null &&
+                questionTags != null;
+
+        if(notClassified) {
+            return new Question(id, imagePath);
+        }
+        else if(classified) {
+            return new Question(id, imagePath, year, topic, type, answer, questionTags);
+        }
+        else{
+            throw new IOException("Invalid question data in " + jsonFile);
+        }
+    }
+
+
+
+    private static void checkFilenameMatchesID (Path jsonFile, int id) throws IOException {
         String actualFileName = jsonFile.getFileName().toString();
         String expectedFileName = "question-" + id + ".json";
         if (!expectedFileName.equals(actualFileName)) {
@@ -83,84 +128,31 @@ public final class JSON_Reader {
                     + "' does not match embedded question ID " + id
                     + " (expected '" + expectedFileName + "')");
         }
-
-        String imagePath = readString(root, "imagePath");
-        int year = readInt(root, "year");
-
-        // Read {topic}. A null topic is permitted by the model.
-        JsonNode topicNode = requiredNode(root, "topic");
-        Topic topic = topicNode.isNull() ? null : OBJECT_MAPPER.treeToValue(topicNode, Topic.class);
-
-        // Reading {Subject} and matching it with constructed subject from topic will be done later
-
-        // Read question {type}. It can be null for an incomplete question.
-        JsonNode typeNode = requiredNode(root, "type");
-        Type type = typeNode.isNull() ? null : OBJECT_MAPPER.treeToValue(typeNode, Type.class);
-
-        // We will create question object without {answer} than later add it using question setters
-
-        // Read tags. A null tag set is permitted by the model.
-        JsonNode tagsNode = requiredNode(root, "questionTags");
-        Set<Tag> questionTags;
-        if (tagsNode.isNull()) { questionTags = null;}
-        else {
-            if (!tagsNode.isArray()) {throw new IOException("'questionTags' must be an array or null");}
-            questionTags = OBJECT_MAPPER.convertValue(tagsNode, TAG_SET_TYPE);
-        }
-
-
-        // Construct the question without its answer first.
-        Question question = new Question(id, imagePath, year, topic, type, null, questionTags);
-
-        // Verify the serialized subject agrees with the topic mapping.
-        JsonNode storedSubject = requiredNode(root, "subject");
-        JsonNode expectedSubject = OBJECT_MAPPER.valueToTree(question.getSubject());
-        if (!storedSubject.equals(expectedSubject)) {
+    }
+    private static void checkTopicMatchesSubject(Topic topic, Subject subject) throws IOException {
+        if (topic == null && subject == null) {return;}
+        if (!subject.equals(SubjectTopicMap.getSubject(topic))) {
             throw new IOException("Subject does not match the subject derived from topic");
         }
-
-        // Reconstruct the appropriate concrete answer through Question's setters.
-        JsonNode answerNode = requiredNode(root, "answer");
-        if (!answerNode.isNull() && type == null) {throw new IOException("A non-null answer requires a question type");}
-
-        if (!answerNode.isNull()) {readAnswer(question, type, answerNode);}
-        return question;
+    }
+    private static void checkTypeMatchesAnswer(Type type, Answer answer) throws IOException {
+        if(answer == null && type!=null) {throw new IOException("Answer is null but type is not");}
+        if(answer != null && type==null) {throw new IOException("Answer is not null but type is null");}
+        if (type == null && answer == null) {return;}
+        boolean compatible = switch (type) {
+            case MCQ -> answer instanceof MCQ_Answer;
+            case MSQ -> answer instanceof MSQ_Answer;
+            case NAT -> answer instanceof NAT_Answer;
+        };
+        if (!compatible) {throw new IllegalArgumentException("Answer type does not match question type: " + type);}
     }
 
-    private static void readAnswer(Question question, Type type, JsonNode answerNode) throws IOException {
-        if (!answerNode.isObject()) {throw new IOException("'answer' must be a JSON object or null");}
-        switch (type) {
-            case MCQ -> {
-                JsonNode optionNode = requiredNode(answerNode, "correctOption");
-                AnswerOption correctOption = OBJECT_MAPPER.treeToValue(optionNode, AnswerOption.class);
-                question.setMcqAnswer(correctOption);
-            }
-
-            case MSQ -> {
-                JsonNode optionsNode = requiredNode(answerNode, "correctOptions");
-                if (!optionsNode.isArray()) {throw new IOException("'correctOptions' must be an array");}
-                Set<AnswerOption> correctOptions = OBJECT_MAPPER.convertValue(optionsNode, ANSWER_OPTION_SET_TYPE);
-                question.setMsqAnswer(correctOptions);
-            }
-
-            case NAT -> {
-                double minValue = readDouble(answerNode, "minValue");
-                double maxValue = readDouble(answerNode, "maxValue");
-                question.setNatAnswer(minValue, maxValue);
-            }
-        }
-    }
     private static int readInt(JsonNode object, String fieldName) throws IOException {
         JsonNode node = requiredNode(object, fieldName);
         if (!node.isIntegralNumber() || !node.canConvertToInt()) {
             throw new IOException("'" + fieldName + "' must be an integer");
         }
         return node.intValue();
-    }
-    private static String readString(JsonNode object, String fieldName) throws IOException {
-        JsonNode node = requiredNode(object, fieldName);
-        if (!node.isTextual()) {throw new IOException("'" + fieldName + "' must be a string");}
-        return node.textValue();
     }
     private static double readDouble(JsonNode object, String fieldName) throws IOException {
         JsonNode node = requiredNode(object, fieldName);
@@ -169,6 +161,63 @@ public final class JSON_Reader {
         }
         return node.doubleValue();
     }
+    private static String readImagePath(JsonNode object) throws IOException {
+        JsonNode node = requiredNode(object, "imagePath");
+        if (!node.isTextual()) {throw new IOException("'" + "imagePath" + "' must be a string");}
+        return node.textValue();
+    }
+    private static Topic readTopic(JsonNode object) throws IOException {
+        JsonNode topicNode = requiredNode(object, "topic");
+        return topicNode.isNull() ? null : OBJECT_MAPPER.treeToValue(topicNode, Topic.class);
+    }
+    private static Subject readSubject(JsonNode object) throws IOException {
+        JsonNode subjectNode = requiredNode(object, "subject");
+        return subjectNode.isNull() ? null : OBJECT_MAPPER.treeToValue(subjectNode, Subject.class);
+    }
+    private static Type readType(JsonNode object) throws IOException {
+        JsonNode typeNode = requiredNode(object, "type");
+        return typeNode.isNull() ? null : OBJECT_MAPPER.treeToValue(typeNode, Type.class);
+    }
+    private static Set<Tag> readTags(JsonNode object) throws IOException {
+        JsonNode tagsNode = requiredNode(object, "questionTags");
+        Set<Tag> questionTags;
+        if (tagsNode.isNull()) { questionTags = null;}
+        else {
+            if (!tagsNode.isArray()) {throw new IOException("'questionTags' must be an array or null");}
+            questionTags = OBJECT_MAPPER.convertValue(tagsNode, TAG_SET_TYPE);
+        }
+        return questionTags;
+    }
+    private static Answer readAnswer(JsonNode object, Type type) throws IOException {
+        JsonNode answerNode = requiredNode(object, "answer");
+        if (answerNode.isNull()) {return null;}
+        else {
+            if (!answerNode.isObject()) {throw new IOException("'answer' must be a JSON object or null");}
+            switch (type) {
+                case MCQ -> {
+                    JsonNode optionNode = requiredNode(answerNode, "correctOption");
+                    AnswerOption correctOption = OBJECT_MAPPER.treeToValue(optionNode, AnswerOption.class);
+                    return new MCQ_Answer(correctOption);
+                }
+
+                case MSQ -> {
+                    JsonNode optionsNode = requiredNode(answerNode, "correctOptions");
+                    if (!optionsNode.isArray()) {throw new IOException("'correctOptions' must be an array");}
+                    Set<AnswerOption> correctOptions = OBJECT_MAPPER.convertValue(optionsNode, ANSWER_OPTION_SET_TYPE);
+                    return new MSQ_Answer(correctOptions);
+                }
+
+                case NAT -> {
+                    double minValue = readDouble(answerNode, "minValue");
+                    double maxValue = readDouble(answerNode, "maxValue");
+                    return new NAT_Answer(minValue, maxValue);
+                }
+            }
+        }
+        throw new IOException("Invalid answer type " + type);
+    }
+
+
     private static JsonNode requiredNode(JsonNode object, String fieldName) throws IOException {
         if (!object.has(fieldName)) {throw new IOException("Required JSON property is missing: " + fieldName);}
         return object.get(fieldName);

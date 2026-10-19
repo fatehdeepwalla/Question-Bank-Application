@@ -1,5 +1,5 @@
 
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.listController;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class QuestionQueryService {
+public class Query {
 
-    public List<Question> filterAndSort(List<Question> questions, QuestionFilter filter) {
+    public List<Question> filterAndSort(List<Question> questions, Filter filter) {
         return questions.stream()
                 .filter(question -> matches(question, filter))
                 .sorted(comparatorFor(filter)).toList();
     }
 
-    private boolean matches(Question question, QuestionFilter filter) {
+    private boolean matches(Question question, Filter filter) {
 
         // Year
-        if (filter.getYear() != null && question.getYear() != filter.getYear().intValue()) {
+        if (filter.getYear() != null && question.getYear() != filter.getYear()) {
             return false;
         }
 
@@ -40,8 +40,7 @@ public class QuestionQueryService {
 
         for (Tag tag : Tag.values()) {
 
-            boolean hasTag =
-                    questionTags != null && questionTags.contains(tag);
+            boolean hasTag = questionTags != null && questionTags.contains(tag);
 
             switch (filter.getTagState(tag)) {
                 case INCLUDE -> {
@@ -63,7 +62,7 @@ public class QuestionQueryService {
         return true;
     }
 
-    private Comparator<Question> comparatorFor(QuestionFilter filter) {
+    private Comparator<Question> comparatorFor(Filter filter) {
         if ("year".equals(filter.getSortBy())) {
             return (left, right) -> compareByYear(left, right, filter.getDirection());
         }
@@ -94,7 +93,5 @@ public class QuestionQueryService {
         return comparison != 0 ? comparison : Integer.compare(left.getId(), right.getId());
     }
 
-    private boolean isYearAssigned(int year) {
-        return year >= 1990 && year <= 2030;
-    }
+    private boolean isYearAssigned(int year) {return !(year<1995 || year >2030);}
 }

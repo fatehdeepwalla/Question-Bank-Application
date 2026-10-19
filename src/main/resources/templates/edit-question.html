@@ -12,7 +12,7 @@
     <div th:replace="~{listFragments/Portfolio_Links :: Portfolio_Links}"></div>
 
     <main class="page-main edit-main">
-        <a class="edit-back-link" th:href="@{/questions}">
+        <a class="edit-back-link" th:href="${returnUrl}">
             <span aria-hidden="true">←</span> Back to question library
         </a>
 
@@ -38,6 +38,8 @@
                   th:action="@{/questions/{id}/edit(id=${questionId})}"
                   th:object="${form}">
 
+                <input type="hidden" name="returnUrl" th:value="${returnUrl}">
+
                 <section class="edit-form-section">
                     <div class="edit-section-heading">
                         <span class="edit-section-icon" aria-hidden="true">01</span>
@@ -52,7 +54,7 @@
                             <span>GATE year <small>Required</small></span>
                             <input type="number"
                                    th:field="*{year}"
-                                   min="1990"
+                                   min="1995"
                                    max="2030"
                                    step="1"
                                    inputmode="numeric"
@@ -233,7 +235,7 @@
                 </section>
 
                 <div class="edit-form-actions">
-                    <a class="edit-cancel-button" th:href="@{/questions}">Cancel</a>
+                    <a class="edit-cancel-button" th:href="${returnUrl}">Cancel</a>
                     <button class="edit-save-button" type="submit">
                         <span aria-hidden="true">✓</span> Save changes
                     </button>

@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 /** View model for displaying a Question without changing the domain model. */
-public class ViewDTO {
+public class QuestionDTO {
 
     //////////////////////////////////// Fields ////////////////////////////////////////
     // id
@@ -47,14 +47,14 @@ public class ViewDTO {
     private final boolean classified;
 
     //////////////////////////////////// Constructor ////////////////////////////////////////
-    public ViewDTO(Question question) {
+    public QuestionDTO(Question question) {
         this.id = question.getId();
         this.idLabel = String.format(Locale.ROOT, "QB-%04d", question.getId());
 
         this.imageUrl = buildImageUrl(question.getImagePath());
 
         int year = question.getYear();
-        this.yearAssigned = year >= 1990 && year <= 2030;
+        this.yearAssigned = (year!=-9999);
         this.yearLabel = yearAssigned ? Integer.toString(year) : "Year not set";
 
         Subject subject = question.getSubject();
@@ -115,16 +115,18 @@ public class ViewDTO {
 
     //////////////////////////////////// Helper Methods ////////////////////////////////////////
     private static String buildImageUrl(String imagePath) {
-        if (imagePath == null || imagePath.isBlank()) {return null;}
+        if (imagePath == null || imagePath.isBlank()) {throw new RuntimeException("A valid image path should always be there inside a question");}
 
-        // JSON paths may have been written on Windows, so normalize both slash styles.
+        // A URL which can be accepted in HTML
         String normalized = imagePath.replace('\\', '/');
+
+        // Extracting the filename
         int lastSlash = normalized.lastIndexOf('/');
         String fileName = lastSlash >= 0 ? normalized.substring(lastSlash + 1) : normalized;
         if (fileName.isBlank() || fileName.equals(".") || fileName.equals("..")) {return null;}
 
-        // Images are served from the configured Question_Images directory.
-        return "/question-images/" + UriUtils.encodePathSegment(fileName, StandardCharsets.UTF_8);
+        // To replace the white spaces as they will crete problem in HTML
+        return "/images-folder/" + UriUtils.encodePathSegment(fileName, StandardCharsets.UTF_8);
     }
     private static String buildAnswerLabel(Answer answer) {
 

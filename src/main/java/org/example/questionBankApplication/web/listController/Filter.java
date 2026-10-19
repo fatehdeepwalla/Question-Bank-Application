@@ -1,5 +1,5 @@
 
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.listController;
 
 import org.example.questionBankApplication.model.Tag;
 import org.example.questionBankApplication.model.subject_topic.Subject;
@@ -12,8 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class QuestionFilter {
+public final class Filter {
 
+    // Some extra fields
     public enum TagState {INCLUDE("include"), NEUTRAL("neutral"), EXCLUDE("exclude");
         private final String value;
         TagState(String value) {
@@ -24,30 +25,40 @@ public final class QuestionFilter {
         }
     }
 
+
+    // Values from Filter Section
     private final Integer year;
-    private final String selectedYear;
     private final Subject subject;
     private final Topic topic;
+    private final EnumMap<Tag, TagState> tagStates = new EnumMap<>(Tag.class);
+
     private final String sortBy;
     private final String direction;
 
-    private final EnumMap<Tag, TagState> tagStates = new EnumMap<>(Tag.class);
-
     private final List<String> validationErrors;
 
-    private QuestionFilter(Map<String, String> parameters) {
+
+    public static Filter fromParameters(Map<String, String> parameters) {
+        return new Filter(parameters);
+    }
+
+    ////////////////////////////////////////////////// Private Constructor /////////////////////////////////////////////
+    private Filter(Map<String, String> parameters) {
         Map<String, String> params = parameters == null ? Map.of() : parameters;
         List<String> errors = new ArrayList<>();
 
-        selectedYear = valueOf(params, "year");
-        year = parseYear(selectedYear, errors);
-        subject = parseEnum(Subject.class, valueOf(params, "subject"), "subject", errors);
+        // Getting Year
+        String yearText = valueOf(params, "year");
+        year = parseYear(yearText, errors);
 
+        // Getting Subject
+        String subjectText = valueOf(params, "subject");
+        subject = parseEnum(subjectText, Subject.class, "subject", errors);
+
+        // Getting topic
         String topicText = valueOf(params, "topic");
-        Topic parsedTopic = parseEnum(Topic.class, topicText, "topic", errors);
-
+        Topic parsedTopic = parseEnum(topicText, Topic.class, "topic", errors);
         Topic validTopic = null;
-
         if (!topicText.isBlank() && parsedTopic != null) {
             if (subject == null) {
                 errors.add("Select a valid subject before selecting a topic.");
@@ -57,49 +68,40 @@ public final class QuestionFilter {
                 validTopic = parsedTopic;
             }
         }
-
         topic = validTopic;
 
+        // SortBy parameter
         String requestedSort = valueOf(params, "sortBy");
-
-        if (requestedSort.isBlank() || requestedSort.equals("id")
-                || requestedSort.equals("year")) {
+        if (requestedSort.isBlank() || requestedSort.equals("id") || requestedSort.equals("year")) {
             sortBy = requestedSort.isBlank() ? "id" : requestedSort;
         } else {
             errors.add("Invalid sorting field. Defaulting to Question ID.");
             sortBy = "id";
         }
 
+        // Sorting Direction
         String requestedDirection = valueOf(params, "direction");
-
-        if (requestedDirection.isBlank()
-                || requestedDirection.equals("asc")
-                || requestedDirection.equals("desc")) {
-            direction = requestedDirection.isBlank()
-                    ? "asc"
-                    : requestedDirection;
+        if (requestedDirection.isBlank() || requestedDirection.equals("asc") || requestedDirection.equals("desc")) {
+            direction = requestedDirection.isBlank() ? "asc" : requestedDirection;
         } else {
             errors.add("Invalid sorting order. Defaulting to ascending.");
             direction = "asc";
         }
 
+        // Tag
         for (Tag tag : Tag.values()) {
             String requestedState = params.get("tag_" + tag.name());
-
-            tagStates.put(
-                    tag,
-                    parseTagState(requestedState, tag, errors)
-            );
+            tagStates.put(tag, parseTagState(requestedState, tag, errors));
         }
 
         validationErrors = List.copyOf(errors);
     }
 
-    public static QuestionFilter fromParameters(Map<String, String> parameters) {
-        return new QuestionFilter(parameters);
-    }
 
+
+    ////////////////////////////////////////////////// Helpers /////////////////////////////////////////////////////////
     private static String valueOf(Map<String, String> parameters, String key) {
+        // Sometimes my form sends a blank value and sometimes it sends null
         String value = parameters.get(key);
         return value == null ? "" : value.trim();
     }
@@ -108,8 +110,8 @@ public final class QuestionFilter {
         if (value.isBlank()) {return null;}
         try {
             int year = Integer.parseInt(value);
-            if (year < 1990 || year > 2030) {
-                errors.add("GATE year must be between 1990 and 2030.");
+            if (year<1995 || year >2030) {
+                errors.add("GATE year must be between 1995 and 2030.");
                 return null;
             }
             return year;
@@ -119,7 +121,7 @@ public final class QuestionFilter {
         }
     }
 
-    private static <E extends Enum<E>> E parseEnum(Class<E> enumType, String value, String fieldName, List<String> errors) {
+    private static <E extends Enum<E>> E parseEnum(String value, Class<E> enumType, String fieldName, List<String> errors) {
         if (value.isBlank()) {return null;}
 
         try {
@@ -146,33 +148,19 @@ public final class QuestionFilter {
         };
     }
 
-    public Integer getYear() {
-        return year;
-    }
-    public String getSelectedYear() {
-        return selectedYear;
-    }
-    public Subject getSubject() {
-        return subject;
-    }
-    public Topic getTopic() {
-        return topic;
-    }
-    public String getSelectedSubject() {
-        return subject == null ? "" : subject.name();
-    }
-    public String getSelectedTopic() {
-        return topic == null ? "" : topic.name();
-    }
-    public String getSortBy() {
-        return sortBy;
-    }
-    public String getDirection() {
-        return direction;
-    }
-    public TagState getTagState(Tag tag) {
-        return tagStates.getOrDefault(tag, TagState.NEUTRAL);
-    }
+    ////////////////////////////////////////////////// Getters for querying questions///////////////////////////////////
+    public Integer getYear() {return year;}
+    public Subject getSubject() {return subject;}
+    public Topic getTopic() {return topic;}
+    public String getSelectedSubject() {return subject == null ? "" : subject.name();}
+    public String getSelectedTopic() {return topic == null ? "" : topic.name();}
+    public String getSortBy() {return sortBy;}
+    public String getDirection() {return direction;}
+    public TagState getTagState(Tag tag) {return tagStates.getOrDefault(tag, TagState.NEUTRAL);}
+
+
+
+    ////////////////////////////////////////////////// Getters for returning data to list.html//////////////////////////
     public Map<String, String> getTagStatesForView() {
         Map<String, String> result = new LinkedHashMap<>();
         for (Tag tag : Tag.values()) {
@@ -180,7 +168,5 @@ public final class QuestionFilter {
         }
         return result;
     }
-    public List<String> getValidationErrors() {
-        return validationErrors;
-    }
+    public List<String> getValidationErrorsForView() {return validationErrors;}
 }

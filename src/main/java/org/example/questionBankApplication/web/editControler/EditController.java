@@ -1,4 +1,4 @@
-package org.example.questionBankApplication.web.controllerAndHelpers;
+package org.example.questionBankApplication.web.editControler;
 
 import org.example.questionBankApplication.model.Question;
 import org.example.questionBankApplication.model.Tag;
@@ -12,16 +12,18 @@ import org.example.questionBankApplication.model.subject_topic.Subject;
 import org.example.questionBankApplication.model.subject_topic.SubjectTopicMap;
 import org.example.questionBankApplication.model.subject_topic.Topic;
 import org.example.questionBankApplication.web.QuestionService;
-import org.example.questionBankApplication.web.ViewDTO;
+import org.example.questionBankApplication.web.QuestionDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -33,42 +35,48 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
-public class QuestionEditController {
+public class EditController {
 
     private static final int UNASSIGNED_YEAR = -9999;
     private static final int MAX_TAGS = 3;
 
     private final QuestionService questionService;
 
-    public QuestionEditController(QuestionService questionService) {
+    public EditController(QuestionService questionService) {
         this.questionService = questionService;
     }
 
     @GetMapping("/questions/{id}/edit")
-    public String showEditPage(@PathVariable int id,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
+    public String showEditPage(
+            @PathVariable int id,
+            @RequestParam(name = "returnUrl", defaultValue = "/questions") String returnUrl,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        String safeReturnUrl = safeReturnUrl(returnUrl);
         Optional<Question> found = questionService.findById(id);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Question " + id + " was not found.");
-            return "redirect:/questions";
+            return "redirect:" + safeReturnUrl;
         }
 
         Question question = found.get();
-        QuestionEditForm form = toForm(question);
-        addEditPageAttributes(model, question, form, List.of());
+        EditForm form = toForm(question);
+        addEditPageAttributes(model, question, form, List.of(), safeReturnUrl);
         return "edit-question";
     }
 
     @PostMapping("/questions/{id}/edit")
-    public String saveEdit(@PathVariable int id,
-                           @ModelAttribute("form") QuestionEditForm form,
-                           Model model,
-                           RedirectAttributes redirectAttributes) {
+    public String saveEdit(
+            @PathVariable int id,
+            @RequestParam(name = "returnUrl", defaultValue = "/questions") String returnUrl,
+            @ModelAttribute("form") EditForm form,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        String safeReturnUrl = safeReturnUrl(returnUrl);
         Optional<Question> found = questionService.findById(id);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Question " + id + " was not found.");
-            return "redirect:/questions";
+            return "redirect:" + safeReturnUrl;
         }
 
         Question original = found.get();
@@ -92,8 +100,23 @@ public class QuestionEditController {
         Set<Tag> tags = parseTags(form.getSelectedTags(), errors);
         Answer answer = parseAnswer(form, type, errors);
 
+        boolean fullyClassified =
+                year != UNASSIGNED_YEAR
+                && subject != null
+                && topic != null
+                && type != null
+                && answer != null
+                && tags != null;
+
+        if (errors.isEmpty() && !fullyClassified) {
+            errors.add(
+                    "Complete the year, subject, topic, question type, and answer before saving. "
+                    + "Partially classified questions are not allowed."
+            );
+        }
+
         if (!errors.isEmpty()) {
-            addEditPageAttributes(model, original, form, errors);
+            addEditPageAttributes(model, original, form, errors, safeReturnUrl);
             return "edit-question";
         }
 
@@ -106,7 +129,7 @@ public class QuestionEditController {
             errors.add(exception.getMessage() == null
                     ? "The submitted question details are not valid."
                     : exception.getMessage());
-            addEditPageAttributes(model, original, form, errors);
+            addEditPageAttributes(model, original, form, errors, safeReturnUrl);
             return "edit-question";
         }
 
@@ -115,22 +138,25 @@ public class QuestionEditController {
         } catch (IOException | IllegalArgumentException exception) {
             errors.add("The question could not be saved. The original JSON record has been kept. "
                     + safeMessage(exception));
-            addEditPageAttributes(model, original, form, errors);
+            addEditPageAttributes(model, original, form, errors, safeReturnUrl);
             return "edit-question";
         }
 
         redirectAttributes.addFlashAttribute("successMessage", "Question " + id + " was updated successfully.");
-        return "redirect:/questions";
+        return "redirect:" + safeReturnUrl;
     }
 
-    private void addEditPageAttributes(Model model,
-                                       Question question,
-                                       QuestionEditForm form,
-                                       List<String> errors) {
-        ViewDTO view = new ViewDTO(question);
+    private void addEditPageAttributes(
+            Model model,
+            Question question,
+            EditForm form,
+            List<String> errors,
+            String returnUrl) {
+        QuestionDTO view = new QuestionDTO(question);
         model.addAttribute("questionId", question.getId());
         model.addAttribute("questionIdLabel", view.getIdLabel());
         model.addAttribute("questionImageUrl", view.getImageUrl());
+        model.addAttribute("returnUrl", returnUrl);
         model.addAttribute("form", form);
         model.addAttribute("editErrors", errors);
         model.addAttribute("subjectOptions", Subject.values());
@@ -151,11 +177,11 @@ public class QuestionEditController {
         model.addAttribute("subjectTopicOptions", subjectTopicOptions);
     }
 
-    private QuestionEditForm toForm(Question question) {
-        QuestionEditForm form = new QuestionEditForm();
+    private EditForm toForm(Question question) {
+        EditForm form = new EditForm();
 
         int year = question.getYear();
-        form.setYear(year >= 1990 && year <= 2030 ? Integer.toString(year) : "");
+        form.setYear(year >= 1995 && year <= 2030 ? Integer.toString(year) : "");
         form.setSubject(question.getSubject() == null ? "" : question.getSubject().name());
         form.setTopic(question.getTopic() == null ? "" : question.getTopic().name());
         form.setType(question.getType() == null ? "" : question.getType().name());
@@ -189,8 +215,8 @@ public class QuestionEditController {
         }
         try {
             int year = Integer.parseInt(rawYear.trim());
-            if (year < 1990 || year > 2030) {
-                errors.add("GATE year must be between 1990 and 2030, or left blank if it is unknown.");
+            if (year < 1995 || year > 2030) {
+                errors.add("GATE year must be between 1995 and 2030, or left blank if it is unknown.");
                 return UNASSIGNED_YEAR;
             }
             return year;
@@ -200,10 +226,7 @@ public class QuestionEditController {
         }
     }
 
-    private <E extends Enum<E>> E parseOptionalEnum(Class<E> enumType,
-                                                    String rawValue,
-                                                    String fieldLabel,
-                                                    List<String> errors) {
+    private <E extends Enum<E>> E parseOptionalEnum(Class<E> enumType, String rawValue, String fieldLabel, List<String> errors) {
         if (rawValue == null || rawValue.isBlank()) {
             return null;
         }
@@ -231,7 +254,7 @@ public class QuestionEditController {
         return tags;
     }
 
-    private Answer parseAnswer(QuestionEditForm form, Type type, List<String> errors) {
+    private Answer parseAnswer(EditForm form, Type type, List<String> errors) {
         if (type == null) {
             return null;
         }
@@ -290,6 +313,29 @@ public class QuestionEditController {
             }
         }
         return null;
+    }
+
+    /**
+     * Accept only local return URLs for the question list, including its filter query string.
+     * Invalid or external URLs safely fall back to the unfiltered question list.
+     */
+    private String safeReturnUrl(String candidate) {
+        if (candidate == null || candidate.isBlank()) {
+            return "/questions";
+        }
+        try {
+            URI uri = URI.create(candidate);
+            if (uri.isAbsolute()
+                    || uri.getAuthority() != null
+                    || uri.getHost() != null
+                    || !"/questions".equals(uri.getPath())
+                    || uri.getFragment() != null) {
+                return "/questions";
+            }
+            return uri.toASCIIString();
+        } catch (IllegalArgumentException exception) {
+            return "/questions";
+        }
     }
 
     private String safeMessage(Exception exception) {

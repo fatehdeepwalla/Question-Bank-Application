@@ -20,8 +20,7 @@ public class ImageWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/question-images/**")
-                .addResourceLocations(imageLocation);
+        registry.addResourceHandler("/images-folder/**").addResourceLocations(imageLocation);
     }
 }
 
