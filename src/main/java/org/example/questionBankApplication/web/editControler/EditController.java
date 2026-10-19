@@ -45,9 +45,7 @@ public class EditController {
     }
 
     @GetMapping("/questions/{id}/edit")
-    public String showEditPage(@PathVariable int id,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
+    public String showEditPage(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Question> found = questionService.findById(id);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Question " + id + " was not found.");
@@ -61,10 +59,7 @@ public class EditController {
     }
 
     @PostMapping("/questions/{id}/edit")
-    public String saveEdit(@PathVariable int id,
-                           @ModelAttribute("form") EditForm form,
-                           Model model,
-                           RedirectAttributes redirectAttributes) {
+    public String saveEdit(@PathVariable int id, @ModelAttribute("form") EditForm form, Model model, RedirectAttributes redirectAttributes) {
         Optional<Question> found = questionService.findById(id);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Question " + id + " was not found.");
@@ -123,10 +118,7 @@ public class EditController {
         return "redirect:/questions";
     }
 
-    private void addEditPageAttributes(Model model,
-                                       Question question,
-                                       EditForm form,
-                                       List<String> errors) {
+    private void addEditPageAttributes(Model model, Question question, EditForm form, List<String> errors) {
         QuestionDTO view = new QuestionDTO(question);
         model.addAttribute("questionId", question.getId());
         model.addAttribute("questionIdLabel", view.getIdLabel());
@@ -155,7 +147,7 @@ public class EditController {
         EditForm form = new EditForm();
 
         int year = question.getYear();
-        form.setYear(year >= 1990 && year <= 2030 ? Integer.toString(year) : "");
+        form.setYear(year >= 1995 && year <= 2030 ? Integer.toString(year) : "");
         form.setSubject(question.getSubject() == null ? "" : question.getSubject().name());
         form.setTopic(question.getTopic() == null ? "" : question.getTopic().name());
         form.setType(question.getType() == null ? "" : question.getType().name());
@@ -189,8 +181,8 @@ public class EditController {
         }
         try {
             int year = Integer.parseInt(rawYear.trim());
-            if (year < 1990 || year > 2030) {
-                errors.add("GATE year must be between 1990 and 2030, or left blank if it is unknown.");
+            if (year < 1995 || year > 2030) {
+                errors.add("GATE year must be between 1995 and 2030, or left blank if it is unknown.");
                 return UNASSIGNED_YEAR;
             }
             return year;
@@ -200,10 +192,7 @@ public class EditController {
         }
     }
 
-    private <E extends Enum<E>> E parseOptionalEnum(Class<E> enumType,
-                                                    String rawValue,
-                                                    String fieldLabel,
-                                                    List<String> errors) {
+    private <E extends Enum<E>> E parseOptionalEnum(Class<E> enumType, String rawValue, String fieldLabel, List<String> errors) {
         if (rawValue == null || rawValue.isBlank()) {
             return null;
         }

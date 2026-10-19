@@ -54,8 +54,6 @@ public class EditForm {
 
     public List<String> getSelectedTags() { return selectedTags; }
     public void setSelectedTags(List<String> selectedTags) {
-        this.selectedTags = selectedTags == null
-                ? new ArrayList<>()
-                : new ArrayList<>(selectedTags);
+        this.selectedTags = selectedTags == null ? new ArrayList<>() : new ArrayList<>(selectedTags);
     }
 }
